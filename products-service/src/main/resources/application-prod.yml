@@ -1,0 +1,27 @@
+environment: dev
+
+spring:
+  application:
+    name: product
+  cloud:
+    bootstrap:
+      enabled: true
+  kafka:
+    bootstrap-servers: PLAINTEXT://kafka:9094
+
+redis.hostname: "productsdb"
+redis.port: "6379"
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"

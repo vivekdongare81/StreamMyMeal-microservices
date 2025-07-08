@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/ArminSmajlagic/Spring-Boot-Microservices/tree/main/ConfigServer
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery:8761/eureka/
+    registerWithEureka: true
+
+server:
+  port: 8084
+
+

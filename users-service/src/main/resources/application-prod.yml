@@ -1,0 +1,17 @@
+environment: prod
+
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://userspgsql:5432/userdb
+    username: admin
+    password: Qwertz123
+    driverClassName: org.postgresql.Driver
+
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"

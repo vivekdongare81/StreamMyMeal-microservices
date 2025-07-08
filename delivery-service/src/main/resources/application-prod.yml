@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+environment: dev
+
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      database: deliveries
+      port: 27018
+      host: deliveriesdb
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"

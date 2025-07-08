@@ -1,0 +1,34 @@
+server:
+  port: 8082
+
+environment: General Environment
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: order
+  cloud:
+    bootstrap:
+      enabled: true
+  zipkin:
+    baseUrl : http://localhost:9411/zipkin/
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5433/orderdb
+    username: admin
+    password: Qwertz123
+    driverClassName: org.postgresql.Driver
+
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0

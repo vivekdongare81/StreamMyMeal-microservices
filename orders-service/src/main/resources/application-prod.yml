@@ -1,0 +1,14 @@
+environment: dev
+
+spring:
+  zipkin:
+    baseUrl : http://zipkin:9411/zipkin/
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://orderdb:5433/orderdb
+    username: admin
+    password: Qwertz123
+    driverClassName: org.postgresql.Driver
+
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"

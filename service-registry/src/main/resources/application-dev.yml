@@ -1,0 +1,7 @@
+server:
+  port: 8761
+
+environment: dev
+
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"

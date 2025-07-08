@@ -1,0 +1,30 @@
+server:
+  port: 8761
+
+environment: General Environment
+
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+
+spring:
+  application:
+    name: discovery
+  cloud:
+    bootstrap:
+      enabled: true
+  profiles:
+    active: dev
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0

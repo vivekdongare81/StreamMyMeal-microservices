@@ -1,0 +1,26 @@
+server:
+  port: 8084
+
+environment: General Environment
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: restaurant
+  cloud:
+    bootstrap:
+      enabled: true
+
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0

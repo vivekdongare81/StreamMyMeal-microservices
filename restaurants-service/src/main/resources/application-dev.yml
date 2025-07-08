@@ -1,0 +1,14 @@
+environment: dev
+
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      database: restaurants
+      port: 27017
+      host: localhost
+
+
+
+jwt.secretKey: "zlN93cNdQE8hYzSEhLmvl4mGfqcy3wQG2VMHFWpxIx+o2WPkbLkNc5T3xilDSvhC"
