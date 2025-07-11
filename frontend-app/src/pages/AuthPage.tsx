@@ -11,6 +11,11 @@ import { toast } from "sonner";
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [signupName, setSignupName] = useState("Admin");
+  const [signupEmail, setSignupEmail] = useState("admin@streammymeal.com");
+  const [signupPassword, setSignupPassword] = useState("admin123");
+  const [signinEmail, setSigninEmail] = useState("admin@streammymeal.com");
+  const [signinPassword, setSigninPassword] = useState("admin123");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +58,7 @@ const AuthPage = () => {
                   <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="email" type="email" placeholder="your@email.com" className="pl-10" required />
+                    <Input id="email" type="email" placeholder="your@email.com" className="pl-10" required value={signinEmail} onChange={e => setSigninEmail(e.target.value)} />
                   </div>
                 </div>
                 <div>
@@ -66,6 +71,7 @@ const AuthPage = () => {
                       placeholder="Your password" 
                       className="pl-10 pr-10" 
                       required 
+                      value={signinPassword} onChange={e => setSigninPassword(e.target.value)}
                     />
                     <Button
                       type="button"
@@ -90,14 +96,14 @@ const AuthPage = () => {
                   <Label htmlFor="name">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="name" placeholder="Your full name" className="pl-10" required />
+                    <Input id="name" placeholder="Your full name" className="pl-10" required value={signupName} onChange={e => setSignupName(e.target.value)} />
                   </div>
                 </div>
                 <div>
                   <Label htmlFor="signup-email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="signup-email" type="email" placeholder="your@email.com" className="pl-10" required />
+                    <Input id="signup-email" type="email" placeholder="your@email.com" className="pl-10" required value={signupEmail} onChange={e => setSignupEmail(e.target.value)} />
                   </div>
                 </div>
                 <div>
@@ -110,6 +116,7 @@ const AuthPage = () => {
                       placeholder="Create a password" 
                       className="pl-10 pr-10" 
                       required 
+                      value={signupPassword} onChange={e => setSignupPassword(e.target.value)}
                     />
                     <Button
                       type="button"

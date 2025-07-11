@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { Search, Play, Star, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { restaurantsData } from '../data/restaurants';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { RestaurantService, Restaurant } from "@/services";
+import CuisinePosters from "../components/CuisinePosters";
 
 const Index = () => {
+  const restaurants = restaurantsData;
   const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>([]);
   const [liveRestaurants, setLiveRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,63 +78,46 @@ const Index = () => {
             <Button asChild size="lg" variant="secondary">
               <Link to="/restaurants">Browse Restaurants</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
+            <Button asChild size="lg" variant="outline" className="bg-white text-black border-white/50 hover:bg-gray-100 hover:border-black">
               <Link to="/live/1">
-                <span className="text-white">Watch Live Cooking</span>
+                <span className="text-black">Watch Live Cooking</span>
               </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Live Cooking Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Live Cooking Sessions</h2>
-            <p className="text-muted-foreground">Watch your favorite chefs cook in real-time</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 3 }).map((_, index) => (
-                <Card key={index} className="overflow-hidden animate-pulse">
-                  <div className="w-full h-48 bg-muted"></div>
-                  <CardContent className="p-4">
-                    <div className="h-4 bg-muted rounded mb-2"></div>
-                    <div className="h-3 bg-muted rounded w-2/3"></div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              liveRestaurants.map((restaurant) => (
-              <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
-                <div className="relative">
-                  <img src={restaurant.image} alt={restaurant.name} className="w-full h-48 object-cover" />
-                  <Badge className="absolute top-2 left-2 bg-red-500 text-white animate-pulse">
-                    <Play className="w-3 h-3 mr-1" />
-                    LIVE
+        {/* Live Streaming Banner */}
+        <div className="bg-gradient-hero rounded-lg p-6 gap-4 mx-5 mb-6 text-white mt-12">
+          <h2 className="text-2xl font-bold mb-2">Live Cooking Sessions</h2>
+          <p className="mb-4">Watch your favorite chefs cook live and order the same dish!</p>
+          <div className="flex gap-8 overflow-x-auto">
+            {restaurants.filter(r => r.isLive).map((restaurant) => (
+              <Link
+                key={restaurant.id}
+                to={`/live/${restaurant.id}`}
+                className="flex-shrink-0 bg-white/20 backdrop-blur-sm rounded-lg p-3 hover:bg-white/30 transition-colors"
+              >
+                <div className="flex items-center gap-2 text-sm">
+                  <Play className="w-4 h-4" />
+                  <span className="font-medium">{restaurant.name}</span>
+                  <Badge variant="secondary" className="bg-red-500 text-white">
+                    {restaurant.viewers} watching
                   </Badge>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-2">{restaurant.name}</h3>
-                  <p className="text-muted-foreground mb-3">{restaurant.cuisine}</p>
-                  {restaurant.viewers && (
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {restaurant.viewers} viewers watching
-                    </p>
-                  )}
-                  <Button asChild className="w-full">
-                    <Link to={`/live/${restaurant.id}`}>Watch Now</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-              ))
-            )}
+              </Link>
+            ))}
           </div>
         </div>
-      </section>
+
+      {/* Cuisine Posters Section */}
+      <CuisinePosters />
+
+      <div className="flex justify-center mb-8">
+        <Button asChild variant="outline" size="lg">
+          <Link to="/admin">Go to Admin Panel</Link>
+        </Button>
+      </div>
 
       {/* Featured Restaurants */}
       <section className="py-16 bg-muted/30">
@@ -140,9 +126,8 @@ const Index = () => {
             <h2 className="text-3xl font-bold mb-4">Popular Restaurants</h2>
             <p className="text-muted-foreground">Top-rated restaurants in your area</p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredRestaurants.map((restaurant) => (
+            {featuredRestaurants.slice(0, 3).map((restaurant) => (
               <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
                 <img src={restaurant.image} alt={restaurant.name} className="w-full h-48 object-cover" />
                 <CardContent className="p-4">
@@ -167,8 +152,69 @@ const Index = () => {
               </Card>
             ))}
           </div>
+          <div className="flex justify-center mt-8">
+            <Button asChild variant="outline" size="lg">
+              <Link to="/restaurants">View All Restaurants</Link>
+            </Button>
+          </div>
         </div>
       </section>
+
+
+
+      {/* Live Cooking Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Live Cooking Sessions</h2>
+            <p className="text-muted-foreground">Watch your favorite chefs cook in real-time</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {loading ? (
+              Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index} className="overflow-hidden animate-pulse">
+                  <div className="w-full h-48 bg-muted"></div>
+                  <CardContent className="p-4">
+                    <div className="h-4 bg-muted rounded mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-2/3"></div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              liveRestaurants.slice(0, 3).map((restaurant) => (
+                <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
+                  <div className="relative">
+                    <img src={restaurant.image} alt={restaurant.name} className="w-full h-48 object-cover" />
+                    <Badge className="absolute top-2 left-2 bg-red-500 text-white animate-pulse">
+                      <Play className="w-3 h-3 mr-1" />
+                      LIVE
+                    </Badge>
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-lg mb-2">{restaurant.name}</h3>
+                    <p className="text-muted-foreground mb-3">{restaurant.cuisine}</p>
+                    {restaurant.viewers && (
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {restaurant.viewers} viewers watching
+                      </p>
+                    )}
+                    <Button asChild className="w-full">
+                      <Link to={`/live/${restaurant.id}`}>Watch Now</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="flex justify-center mt-8">
+            <Button asChild variant="outline" size="lg">
+              <Link to="/live">View All Live Streams</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+
     </div>
   );
 };

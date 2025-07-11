@@ -69,5 +69,50 @@ export const restaurantsData: Restaurant[] = [
     image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop",
     isLive: false,
     priceRange: "₹₹"
+  },
+  {
+    id: "7",
+    name: "Chinese Palace",
+    cuisine: "Chinese",
+    rating: 4.4,
+    deliveryTime: "25-40 min",
+    location: "College Street",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop",
+    isLive: false,
+    priceRange: "₹₹"
+  },
+  {
+    id: "8",
+    name: "Chinese Palace",
+    cuisine: "Chinese",
+    rating: 4.4,
+    deliveryTime: "25-40 min",
+    location: "College Street",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop",
+    isLive: false,
+    priceRange: "₹₹"
+  },
+  {
+    id: "9",
+    name: "Tandoori Treats",
+    cuisine: "Indian",
+    rating: 4.6,
+    deliveryTime: "30-40 min",
+    location: "Market Square",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop",
+    isLive: false,
+    priceRange: "₹₹"
+  },
+  {
+    id: "10",
+    name: "Delicious South ",
+    cuisine: "Indian",
+    rating: 4.7,
+    deliveryTime: "35-50 min",
+    location: "Old Town",
+    image: "https://res.cloudinary.com/hz3gmuqw6/image/upload/c_fill,q_30,w_750/f_auto/south-indian-food-phplHtYCF",
+    isLive: true,
+    viewers: 112,
+    priceRange: "₹₹₹"
   }
 ];

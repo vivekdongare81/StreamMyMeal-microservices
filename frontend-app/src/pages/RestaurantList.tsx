@@ -15,9 +15,17 @@ const RestaurantList = () => {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
 
-  const cuisines = ["All", "Indian", "Italian", "Japanese", "American", "Thai"];
+  const cuisines = ["All", "Indian", "Italian", "Chinese","Japanese", "American", "Thai"];
 
   useEffect(() => {
+    // Set cuisine filter from URL if present
+    const cuisineParam = searchParams.get('cuisine');
+    if (cuisineParam && cuisines.includes(cuisineParam)) {
+      setSelectedCuisine(cuisineParam);
+    } else {
+      setSelectedCuisine("All");
+    }
+
     const loadRestaurants = async () => {
       try {
         const searchQuery = searchParams.get('search');

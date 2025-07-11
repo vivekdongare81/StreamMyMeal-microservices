@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AdminPanel from "./pages/AdminPanel";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/restaurants" element={<RestaurantList />} />
           <Route path="/live/:restaurantId" element={<LiveStreaming />} />
           <Route path="/live" element={<LiveStreaming />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/menu/:restaurantId" element={<Menu />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/auth" element={<AuthPage />} />
