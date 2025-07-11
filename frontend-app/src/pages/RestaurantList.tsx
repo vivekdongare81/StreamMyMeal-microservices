@@ -1,25 +1,35 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Search, Filter, Star, Clock, MapPin, Play } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { DataService, Restaurant } from "@/services/dataService";
+import { RestaurantService, Restaurant } from "@/services";
 
 const RestaurantList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
 
   const cuisines = ["All", "Indian", "Italian", "Japanese", "American", "Thai"];
 
   useEffect(() => {
     const loadRestaurants = async () => {
       try {
-        const data = await DataService.getRestaurants();
+        const searchQuery = searchParams.get('search');
+        let data;
+        
+        if (searchQuery) {
+          data = await RestaurantService.searchRestaurants(searchQuery);
+          setSearchTerm(searchQuery);
+        } else {
+          data = await RestaurantService.getRestaurants();
+        }
+        
         setRestaurants(data);
       } catch (error) {
         console.error('Error loading restaurants:', error);
@@ -29,7 +39,7 @@ const RestaurantList = () => {
     };
 
     loadRestaurants();
-  }, []);
+  }, [searchParams]);
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

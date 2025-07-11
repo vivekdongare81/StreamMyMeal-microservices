@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { DataService, Restaurant } from "@/services/dataService";
+import { RestaurantService, Restaurant } from "@/services";
 
 const Index = () => {
   const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>([]);
@@ -17,8 +17,8 @@ const Index = () => {
     const loadData = async () => {
       try {
         const [featured, live] = await Promise.all([
-          DataService.getFeaturedRestaurants(),
-          DataService.getLiveRestaurants()
+          RestaurantService.getFeaturedRestaurants(),
+          RestaurantService.getLiveRestaurants()
         ]);
         setFeaturedRestaurants(featured);
         setLiveRestaurants(live);
@@ -39,8 +39,30 @@ const Index = () => {
       {/* Hero Section */}
       <section className="bg-gradient-hero text-white py-20 mt-16">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">Order Food & Watch Live Cooking</h1>
-          <p className="text-xl mb-8 opacity-90">Discover restaurants, watch chefs cook live, and get fresh food delivered</p>
+          <div className="flex justify-center items-center gap-4 mb-6">
+            <div className="text-4xl">🍳</div>
+            <h1 className="text-5xl font-bold">Order Food & Watch Live Cooking</h1>
+            <div className="text-4xl">🥘</div>
+          </div>
+          <div className="flex justify-center items-center gap-2 mb-8">
+            <div className="text-2xl">✨</div>
+            <p className="text-xl opacity-90">See your food being prepared fresh - ensuring hygiene & quality you can trust</p>
+            <div className="text-2xl">🧼</div>
+          </div>
+          <div className="flex justify-center items-center gap-4 text-sm opacity-80 mb-8">
+            <span className="flex items-center gap-2">
+              <div className="text-green-400">🛡️</div>
+              Hygiene Verified
+            </span>
+            <span className="flex items-center gap-2">
+              <div className="text-blue-400">👁️</div>
+              Live Transparency
+            </span>
+            <span className="flex items-center gap-2">
+              <div className="text-yellow-400">⭐</div>
+              Quality Assured
+            </span>
+          </div>
           
           <div className="max-w-md mx-auto mb-8">
             <div className="relative">
@@ -53,8 +75,10 @@ const Index = () => {
             <Button asChild size="lg" variant="secondary">
               <Link to="/restaurants">Browse Restaurants</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
-              <Link to="/live/1">Watch Live Cooking</Link>
+            <Button asChild size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:border-white">
+              <Link to="/live/1">
+                <span className="text-white">Watch Live Cooking</span>
+              </Link>
             </Button>
           </div>
         </div>

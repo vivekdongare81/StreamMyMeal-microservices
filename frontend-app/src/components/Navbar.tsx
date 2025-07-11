@@ -1,13 +1,50 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, User, ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { CartService } from "@/services";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
-  const cartItems = 3; // Mock cart count
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      const items = CartService.getCartItems();
+      const count = items.reduce((total, item) => total + item.quantity, 0);
+      setCartItemCount(count);
+    };
+
+    updateCartCount();
+    // Listen for storage changes (cart updates)
+    window.addEventListener('storage', updateCartCount);
+    // Custom event for cart updates within same tab
+    window.addEventListener('cartUpdated', updateCartCount);
+
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('cartUpdated', updateCartCount);
+    };
+  }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/restaurants?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
+  const handleCartClick = () => {
+    navigate('/checkout');
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -53,15 +90,24 @@ const Navbar = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
               <Search className="w-4 h-4" />
             </Button>
             
-            <Button variant="ghost" size="sm" className="relative">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="relative"
+              onClick={handleCartClick}
+            >
               <ShoppingCart className="w-4 h-4" />
-              {cartItems > 0 && (
+              {cartItemCount > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                  {cartItems}
+                  {cartItemCount}
                 </Badge>
               )}
             </Button>
@@ -90,6 +136,24 @@ const Navbar = () => {
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
+
+        {/* Search Bar */}
+        {isSearchOpen && (
+          <div className="border-t bg-background/95 backdrop-blur-md p-4">
+            <form onSubmit={handleSearch} className="max-w-md mx-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search restaurants, cuisines, or locations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4"
+                  autoFocus
+                />
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* Mobile Menu */}
         {isMenuOpen && (

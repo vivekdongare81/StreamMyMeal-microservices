@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
-import { DataService, CartItem } from "@/services/dataService";
+import { CartService, OrderService, CartItem } from "@/services";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Checkout = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    const items = DataService.getCartItems();
+    const items = CartService.getCartItems();
     setCartItems(items);
     
     // Redirect to menu if cart is empty
@@ -50,14 +50,18 @@ const Checkout = () => {
     
     try {
       const orderData = {
-        items: cartItems,
-        deliveryAddress,
+        customerInfo: {
+          name: "Customer",
+          email: "customer@example.com",
+          phone: deliveryAddress.phone,
+          address: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.pincode}`
+        },
         paymentMethod,
-        total,
-        timestamp: new Date().toISOString()
+        items: cartItems,
+        total
       };
 
-      const result = await DataService.placeOrder(orderData);
+      const result = await OrderService.placeOrder(orderData);
       
       if (result.success) {
         toast.success(`Order placed successfully! Order ID: ${result.orderId} 🎉`);
