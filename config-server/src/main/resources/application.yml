@@ -1,12 +1,15 @@
 spring:
   application:
     name: config-server
+  profiles:
+    active: native
+    #active: git
   cloud:
     config:
       server:
-        git:
-          uri: https://github.com/ArminSmajlagic/Spring-Boot-Microservices/tree/main/ConfigServer
-
+        native:
+          search-locations:
+          - "classpath:/config"
 
 eureka:
   client:
