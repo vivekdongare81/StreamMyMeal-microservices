@@ -18,7 +18,7 @@ export interface MenuItem {
   description: string;
   price: number;
   image: string;
-  category: string;
+  category?: string;
   isVegetarian: boolean;
   isPopular?: boolean;
 }

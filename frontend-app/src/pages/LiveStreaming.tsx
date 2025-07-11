@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 import { RestaurantService, LiveStreamService, Restaurant, LiveStream } from "@/services";
+import { restaurantsData } from "../data/restaurants";
 
 interface LiveStreamData {
   id: string;
@@ -335,41 +336,44 @@ const LiveStreaming = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {allLiveStreams
               .filter(stream => stream.restaurantId !== restaurantId)
-              .map((stream) => (
-              <Link key={stream.id} to={`/live/${stream.restaurantId}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                  <div className="relative">
-                    <img
-                      src={`https://images.unsplash.com/photo-155939273${Math.floor(Math.random() * 9)}-367ea4eb4db5?w=300&h=200&fit=crop`}
-                      alt={stream.title}
-                      className="w-full h-32 object-cover"
-                    />
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-red-500 text-white animate-pulse text-xs">
-                        <div className="w-1.5 h-1.5 bg-white rounded-full mr-1"></div>
-                        LIVE
-                      </Badge>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <Badge variant="secondary" className="bg-black/50 text-white text-xs">
-                        <Users className="w-2 h-2 mr-1" />
-                        {stream.viewers}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-3">
-                    <h3 className="font-medium mb-1 text-sm line-clamp-2">{stream.title}</h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Live now</span>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-food-warning text-food-warning" />
-                        <span className="text-xs">4.5</span>
+              .map((stream) => {
+                const restaurant = restaurantsData.find(r => r.id === stream.restaurantId);
+                return (
+                  <Link key={stream.id} to={`/live/${stream.restaurantId}`}>
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                      <div className="relative">
+                        <img
+                          src={restaurant?.image || "https://via.placeholder.com/300x200?text=No+Image"}
+                          alt={stream.title}
+                          className="w-full h-32 object-cover"
+                        />
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-red-500 text-white animate-pulse text-xs">
+                            <div className="w-1.5 h-1.5 bg-white rounded-full mr-1"></div>
+                            LIVE
+                          </Badge>
+                        </div>
+                        <div className="absolute top-2 right-2">
+                          <Badge variant="secondary" className="bg-black/50 text-white text-xs">
+                            <Users className="w-2 h-2 mr-1" />
+                            {stream.viewers}
+                          </Badge>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                      <CardContent className="p-3">
+                        <h3 className="font-medium mb-1 text-sm line-clamp-2">{stream.title}</h3>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Live now</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-food-warning text-food-warning" />
+                            <span className="text-xs">4.5</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </div>

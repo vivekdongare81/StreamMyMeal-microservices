@@ -54,10 +54,16 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">F</span>
-            </div>
-            <span className="text-xl font-bold text-primary">FoodStream</span>
+            {/* Chef Hat and Moustache PNG Logo */}
+            <span className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://www.svgheart.com/wp-content/uploads/2022/07/chef-hat-and-moustache_524-430-min.png"
+                alt="Chef Hat Logo"
+                className="w-8 h-8 object-contain"
+                style={{ display: 'block' }}
+              />
+            </span>
+            <span className="text-xl font-bold text-primary">StreamMyMeal</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -85,6 +91,14 @@ const Navbar = () => {
               }`}
             >
               Live Cooking
+            </Link>
+            <Link
+              to="/admin"
+              className={`transition-colors hover:text-primary ${
+                location.pathname.startsWith("/admin") ? "text-primary font-medium" : "text-muted-foreground"
+              }`}
+            >
+              Admin
             </Link>
           </div>
 
@@ -179,6 +193,13 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Live Cooking
+              </Link>
+              <Link
+                to="/admin"
+                className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Admin
               </Link>
               <div className="border-t pt-2 mt-2">
                 <Link
