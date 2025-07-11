@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
-import { DataService, Restaurant, LiveStream } from "@/services/dataService";
+import { RestaurantService, LiveStreamService, Restaurant, LiveStream } from "@/services";
 
 interface LiveStreamData {
   id: string;
@@ -52,27 +52,38 @@ const LiveStreaming = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [liveStream, setLiveStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allLiveStreams, setAllLiveStreams] = useState<LiveStream[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
-      if (!restaurantId) {
-        // If no restaurantId, show first live restaurant
-        const liveRestaurants = await DataService.getLiveRestaurants();
-        if (liveRestaurants.length > 0) {
-          const firstLive = liveRestaurants[0];
-          setRestaurant(firstLive);
-          const stream = await DataService.getLiveStreamByRestaurantId(firstLive.id);
-          setLiveStream(stream);
-        }
-      } else {
-        const [restaurantData, streamData] = await Promise.all([
-          DataService.getRestaurantById(restaurantId),
-          DataService.getLiveStreamByRestaurantId(restaurantId)
+      try {
+        const [allStreams] = await Promise.all([
+          LiveStreamService.getAllLiveStreams()
         ]);
-        setRestaurant(restaurantData);
-        setLiveStream(streamData);
+        setAllLiveStreams(allStreams);
+
+        if (!restaurantId) {
+          // If no restaurantId, show first live restaurant
+          const liveRestaurants = await RestaurantService.getLiveRestaurants();
+          if (liveRestaurants.length > 0) {
+            const firstLive = liveRestaurants[0];
+            setRestaurant(firstLive);
+            const stream = await LiveStreamService.getLiveStreamByRestaurantId(firstLive.id);
+            setLiveStream(stream);
+          }
+        } else {
+          const [restaurantData, streamData] = await Promise.all([
+            RestaurantService.getRestaurantById(restaurantId),
+            LiveStreamService.getLiveStreamByRestaurantId(restaurantId)
+          ]);
+          setRestaurant(restaurantData);
+          setLiveStream(streamData);
+        }
+      } catch (error) {
+        console.error('Error loading live stream data:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadData();
@@ -153,18 +164,31 @@ const LiveStreaming = () => {
           <div className="lg:col-span-2">
             <Card className="overflow-hidden">
               <div className="relative bg-black aspect-video">
-                {/* Video Player Placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                      {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
+                {/* Video Player */}
+                {liveStream?.streamUrl ? (
+                  <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    src={liveStream.streamUrl}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
+                      </div>
+                      <p className="text-sm">Loading live stream...</p>
                     </div>
-                    <p className="text-sm">Live cooking stream placeholder</p>
                   </div>
-                </div>
+                )}
                 
                 {/* Live Badge */}
-                {mockStreamData.isLive && (
+                {liveStream?.isLive && (
                   <div className="absolute top-4 left-4">
                     <Badge className="bg-red-500 text-white animate-pulse">
                       <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
@@ -177,10 +201,10 @@ const LiveStreaming = () => {
                 <div className="absolute top-4 right-4 flex gap-2">
                   <Badge variant="secondary" className="bg-black/50 text-white">
                     <Users className="w-3 h-3 mr-1" />
-                    {mockStreamData.viewers}
+                    {liveStream?.viewers || 0}
                   </Badge>
                   <Badge variant="secondary" className="bg-black/50 text-white">
-                    {mockStreamData.duration}
+                    15:30
                   </Badge>
                 </div>
                 
@@ -198,11 +222,11 @@ const LiveStreaming = () => {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h1 className="text-2xl font-bold mb-2">{mockStreamData.dishName}</h1>
+                    <h1 className="text-2xl font-bold mb-2">{liveStream?.title || "Live Cooking Session"}</h1>
                     <div className="flex items-center gap-4 text-muted-foreground">
-                      <span>{mockStreamData.restaurantName}</span>
+                      <span>{restaurant?.name}</span>
                       <span>•</span>
-                      <span>{mockStreamData.chefName}</span>
+                      <span>Chef Live</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -239,11 +263,31 @@ const LiveStreaming = () => {
               <div className="p-4 border-b">
                 <h3 className="font-semibold flex items-center gap-2">
                   <MessageCircle className="w-4 h-4" />
-                  Live Chat ({mockStreamData.viewers} viewers)
+                  Live Chat ({liveStream?.viewers || 0} viewers)
                 </h3>
               </div>
               
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {liveStream?.chatMessages?.map((message) => (
+                  <div key={message.id} className="flex gap-2">
+                    <Avatar className="w-6 h-6">
+                      <AvatarFallback className="text-xs">
+                        {message.user[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-primary">
+                          {message.user}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(message.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <p className="text-sm break-words">{message.message}</p>
+                    </div>
+                  </div>
+                ))}
                 {messages.map((message) => (
                   <div key={message.id} className="flex gap-2">
                     <Avatar className="w-6 h-6">
@@ -285,28 +329,46 @@ const LiveStreaming = () => {
           </div>
         </div>
         
-        {/* Related Dishes */}
+        {/* Other Live Streams */}
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-6">More from {mockStreamData.restaurantName}</h2>
+          <h2 className="text-2xl font-bold mb-6">Other Live Cooking Sessions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <img
-                  src={`https://images.unsplash.com/photo-155939273${6 + i}-367ea4eb4db5?w=300&h=200&fit=crop`}
-                  alt={`Dish ${i + 1}`}
-                  className="w-full h-32 object-cover"
-                />
-                <CardContent className="p-3">
-                  <h3 className="font-medium mb-1">Delicious Dish {i + 1}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">₹{299 + i * 50}</span>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-food-warning text-food-warning" />
-                      <span className="text-xs">4.{5 + i}</span>
+            {allLiveStreams
+              .filter(stream => stream.restaurantId !== restaurantId)
+              .map((stream) => (
+              <Link key={stream.id} to={`/live/${stream.restaurantId}`}>
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                  <div className="relative">
+                    <img
+                      src={`https://images.unsplash.com/photo-155939273${Math.floor(Math.random() * 9)}-367ea4eb4db5?w=300&h=200&fit=crop`}
+                      alt={stream.title}
+                      className="w-full h-32 object-cover"
+                    />
+                    <div className="absolute top-2 left-2">
+                      <Badge className="bg-red-500 text-white animate-pulse text-xs">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full mr-1"></div>
+                        LIVE
+                      </Badge>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="secondary" className="bg-black/50 text-white text-xs">
+                        <Users className="w-2 h-2 mr-1" />
+                        {stream.viewers}
+                      </Badge>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-3">
+                    <h3 className="font-medium mb-1 text-sm line-clamp-2">{stream.title}</h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Live now</span>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-food-warning text-food-warning" />
+                        <span className="text-xs">4.5</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>

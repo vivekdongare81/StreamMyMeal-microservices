@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
-import { DataService, Restaurant, MenuItem, CartItem } from "@/services/dataService";
+import { RestaurantService, MenuService, CartService, Restaurant, MenuItem, CartItem } from "@/services";
 
 const Menu = () => {
   const { restaurantId } = useParams();
@@ -22,16 +22,16 @@ const Menu = () => {
       if (!restaurantId) return;
       
       try {
-        const [restaurantData, menuData] = await Promise.all([
-          DataService.getRestaurantById(restaurantId),
-          DataService.getMenuByRestaurantId(restaurantId)
-        ]);
+      const [restaurantData, menuData] = await Promise.all([
+        RestaurantService.getRestaurantById(restaurantId),
+        MenuService.getMenuByRestaurantId(restaurantId)
+      ]);
         
         setRestaurant(restaurantData);
         setMenuItems(menuData);
         
         // Load existing cart
-        const existingCart = DataService.getCartItems();
+        const existingCart = CartService.getCartItems();
         setCart(existingCart);
       } catch (error) {
         console.error('Error loading menu data:', error);
@@ -58,7 +58,7 @@ const Menu = () => {
       image: item.image
     };
     
-    DataService.addToCart(cartItem);
+    CartService.addToCart(cartItem);
     
     // Update local cart state
     setCart(prev => {
@@ -80,7 +80,7 @@ const Menu = () => {
   const removeFromCart = (itemId: string) => {
     const existingItem = cart.find(cartItem => cartItem.id === itemId);
     if (existingItem && existingItem.quantity > 1) {
-      DataService.updateCartItemQuantity(itemId, existingItem.quantity - 1);
+      CartService.updateCartItemQuantity(itemId, existingItem.quantity - 1);
       setCart(prev =>
         prev.map(cartItem =>
           cartItem.id === itemId
@@ -89,7 +89,7 @@ const Menu = () => {
         )
       );
     } else {
-      DataService.removeFromCart(itemId);
+      CartService.removeFromCart(itemId);
       setCart(prev => prev.filter(cartItem => cartItem.id !== itemId));
     }
   };
