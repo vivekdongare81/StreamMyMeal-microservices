@@ -1,0 +1,87 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.devsoncall:configserver >---------------------
+[INFO] Building configserver 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.0:run (default-cli) > test-compile @ configserver >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ configserver ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 11 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ configserver ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ configserver ---
+[INFO] skip non existing resourceDirectory /home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/config-server/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ configserver ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.5.0:run (default-cli) < test-compile @ configserver <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.0:run (default-cli) @ configserver ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ 
+ :: Spring Boot ::   v3.5.0
+ :: Spring Cloud Stream ::   v4.3.0
+ :: Spring Cloud Function ::   v4.3.0
+2025-07-12T12:53:21.176+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] c.d.c.ConfigserverApplication            : Starting ConfigserverApplication using Java 17.0.12 with PID 124305 (/home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/config-server/target/classes started by vivek-18890 in /home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/config-server)
+2025-07-12T12:53:21.177+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] c.d.c.ConfigserverApplication            : The following 1 profile is active: "native"
+2025-07-12T12:53:21.930+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] faultConfiguringBeanFactoryPostProcessor : No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-07-12T12:53:21.936+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] faultConfiguringBeanFactoryPostProcessor : No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-07-12T12:53:21.976+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=7e245e9f-0409-345b-b4e7-62da3b818999
+2025-07-12T12:53:22.297+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8090 (http)
+2025-07-12T12:53:22.309+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-07-12T12:53:22.309+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-07-12T12:53:22.360+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-07-12T12:53:22.363+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1159 ms
+2025-07-12T12:53:23.824+05:30  WARN [configserver,,] 124305 --- [configserver] [           main] c.f.c.c.BeanFactoryAwareFunctionRegistry : Failed to locate function 'busConsumer' for function definition 'busConsumer'. Returning null.
+2025-07-12T12:53:23.890+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.s.m.DirectWithAttributesChannel    : Channel 'configserver.springCloudBusInput' has 1 subscriber(s).
+2025-07-12T12:53:24.189+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 23 endpoints beneath base path '/actuator'
+2025-07-12T12:53:24.246+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.i.endpoint.EventDrivenConsumer       : Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-12T12:53:24.247+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.i.channel.PublishSubscribeChannel    : Channel 'configserver.errorChannel' has 1 subscriber(s).
+2025-07-12T12:53:24.247+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.i.endpoint.EventDrivenConsumer       : started bean '_org.springframework.integration.errorLogger'
+2025-07-12T12:53:24.271+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.s.binder.DefaultBinderFactory      : Creating binder: rabbit
+2025-07-12T12:53:24.271+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.s.binder.DefaultBinderFactory      : Constructing binder child context for rabbit
+2025-07-12T12:53:24.317+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.s.binder.DefaultBinderFactory      : Caching the binder: rabbit
+2025-07-12T12:53:24.334+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] c.s.b.r.p.RabbitExchangeQueueProvisioner : declaring queue for inbound: springCloudBus.anonymous.5ZdaEzUsTuS0rwC8fdTiKw, bound to: springCloudBus
+2025-07-12T12:53:24.337+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.a.r.c.CachingConnectionFactory       : Attempting to connect to: [localhost:5672]
+2025-07-12T12:53:24.367+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.a.r.c.CachingConnectionFactory       : Created new connection: rabbitConnectionFactory#6da646b8:0/SimpleConnection@3f142e87 [delegate=amqp://guest@127.0.0.1:5672/, localPort=52922]
+2025-07-12T12:53:24.396+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.stream.binder.BinderErrorChannel   : Channel 'rabbit-228188026.springCloudBusInput.errors' has 1 subscriber(s).
+2025-07-12T12:53:24.397+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.c.stream.binder.BinderErrorChannel   : Channel 'rabbit-228188026.springCloudBusInput.errors' has 2 subscriber(s).
+2025-07-12T12:53:24.409+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.i.a.i.AmqpInboundChannelAdapter      : started bean 'inbound.springCloudBus.anonymous.5ZdaEzUsTuS0rwC8fdTiKw'
+2025-07-12T12:53:24.418+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8090 (http) with context path '/'
+2025-07-12T12:53:24.452+05:30  INFO [configserver,,] 124305 --- [configserver] [           main] c.d.c.ConfigserverApplication            : Started ConfigserverApplication in 3.602 seconds (process running for 3.883)
+2025-07-12T12:53:24.734+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-12T12:53:24.734+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-07-12T12:53:24.735+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-07-12T12:53:24.774+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-1] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/eurekaserver.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:27.704+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-2] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/accounts.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:27.760+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-3] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/accounts-prod.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:27.760+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-3] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/accounts.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:30.951+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-4] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/cards.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:31.002+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-5] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/cards-prod.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:31.002+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-5] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/cards.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:34.382+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-6] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/loans.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:34.449+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-7] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/loans-prod.yml]' via location 'classpath:/config/'
+2025-07-12T12:53:34.449+05:30  INFO [configserver,,] 124305 --- [configserver] [nio-8090-exec-7] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: Config resource 'class path resource [config/loans.yml]' via location 'classpath:/config/'
+2025-07-12T12:56:10.323+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-12T12:56:10.327+05:30  INFO [configserver,,] 124305 --- [configserver] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-12T12:56:10.340+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.a.r.l.SimpleMessageListenerContainer : Waiting for workers to finish.
+2025-07-12T12:56:10.436+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.a.r.l.SimpleMessageListenerContainer : Successfully waited for workers to finish.
+2025-07-12T12:56:10.437+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.i.a.i.AmqpInboundChannelAdapter      : stopped bean 'inbound.springCloudBus.anonymous.5ZdaEzUsTuS0rwC8fdTiKw'
+2025-07-12T12:56:10.440+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.c.stream.binder.BinderErrorChannel   : Channel 'configserver.rabbit-228188026.springCloudBusInput.errors' has 1 subscriber(s).
+2025-07-12T12:56:10.441+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.c.stream.binder.BinderErrorChannel   : Channel 'configserver.rabbit-228188026.springCloudBusInput.errors' has 0 subscriber(s).
+2025-07-12T12:56:10.458+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.i.endpoint.EventDrivenConsumer       : Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-12T12:56:10.458+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.i.channel.PublishSubscribeChannel    : Channel 'configserver.errorChannel' has 0 subscriber(s).
+2025-07-12T12:56:10.459+05:30  INFO [configserver,,] 124305 --- [configserver] [ionShutdownHook] o.s.i.endpoint.EventDrivenConsumer       : stopped bean '_org.springframework.integration.errorLogger'

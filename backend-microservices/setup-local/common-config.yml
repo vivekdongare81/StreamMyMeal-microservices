@@ -1,0 +1,51 @@
+services:
+############### Common Network SERVICE ##################
+  network-deploy-service:
+    networks:
+      - devsoncallNetwork
+      
+#################### Net + DB Configs #######################
+  microservice-db-config:
+    extends:
+      service: network-deploy-service
+    image: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      
+############### Net + Base Configs ##############
+#   microservice-base-config:
+#     extends:
+#       service: network-deploy-service
+#     deploy:
+#       resources:
+#         limits:
+#           memory: 700m
+#     environment:
+#       SPRING_RABBITMQ_HOST: "rabbit"
+#       JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-2.11.0.jar"
+#       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
+#       OTEL_METRICS_EXPORTER: none
+#       OTEL_LOGS_EXPORTER: none
+
+# ############### Base + Config-Server configs  #############
+#   microservice-configserver-config:
+#     extends:
+#       service: microservice-base-config
+#     environment:
+#       SPRING_PROFILES_ACTIVE: default # ACTIVE-PROFILE
+#       SPRING_CONFIG_IMPORT: configserver:http://configserver:8090/
+
+# ############### Config-Server + Eureka  #############
+#   microservice-eureka-config:
+#     extends:
+#       service: microservice-configserver-config
+#     environment:
+#       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8092/eureka/
+

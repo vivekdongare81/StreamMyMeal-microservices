@@ -1,0 +1,72 @@
+auth:
+  enabled: false   # <== Toggle this to true in prod
+
+spring:
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8090/"
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 20s # <= Adjust timeout
+  data:
+    redis: #Redis for Rate Limitter
+      connect-timeout: 2s
+      host: localhost
+      port: 6379
+      timeout: 1s
+      
+  security: #Keyclock Oauth Service 
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:8070/realms/master/protocol/openid-connect/certs"  
+          
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint: #
+    gateway:
+      access: unrestricted
+  metrics: # set Name for Micrometer metrics date
+    tags:
+      application: ${spring.application.name}
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      devsoncall:
+        gatewayserver: DEBUG
+  pattern: #OpenTelemetry
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+        
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 10
+      permittedNumberOfCallsInHalfOpenState: 2
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+

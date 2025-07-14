@@ -1,0 +1,75 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: "cards"
+  profiles:
+    active: "prod"
+  datasource:
+    url: jdbc:postgresql://localhost:8085/cardsdb #fallback -gets Overidden when used docker-compose by cards:8085
+    driver-class-name: org.postgresql.Driver
+    username: root
+    password: root
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  config:
+    import: "optional:configserver:http://localhost:8090/" #fallback -gets Overidden when used docker-compose by configserver:8090
+
+  rabbitmq:
+    host: localhost  #fallback in docker-compose
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      access: unrestricted
+    health:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics: # set Name for Micrometer metrics date
+    tags:
+      application: ${spring.application.name}
+      
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8092/eureka/ #fallback
+      
+info: #Actuator
+  app:
+    name: "accounts"
+    description: "Accounts Microservice"
+    version: "1.0.0"
+    
+logging:
+  level:
+    com:
+      devsoncall:
+        cards: DEBUG
+  pattern: #OpenTelemetry
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+  

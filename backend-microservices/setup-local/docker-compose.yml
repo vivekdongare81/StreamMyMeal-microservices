@@ -1,0 +1,126 @@
+services:
+ ###################  Keyclock Oauth Server ########################
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak
+    ports:
+      - "8070:8080"
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+      
+###################  Kafka service ########################
+  kafka:
+    image: docker.io/bitnami/kafka:3.9
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      # Kraft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      
+      # ADVERTISED Listners default
+      # KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      
+      # Kafka local - 9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+
+      # Kafka docker - 9092
+      #- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+
+      # Kafka docker + local - 9092 9093
+      #- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT://localhost:9093
+
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+ 
+###################  RabbitMQ SERVICE ########################
+  rabbit: 
+    image: rabbitmq:4-management
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+      
+###################  Redis SERVICE ########################
+  redis:
+    image: redis
+    container_name: redis-ms
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+      
+###################  Accounts DB SERVICE ########################
+  accountsdb: 
+    container_name: accountsdb-ms
+    ports:
+      - 8084:5432
+    environment:
+      POSTGRES_DB: accountsdb #DB name 
+    extends:
+      file: common-config.yml
+      service: microservice-db-config
+      
+###################  Cards DB SERVICE ########################
+  cardsdb:
+    container_name: cardsdb-ms
+    ports:
+      - 8085:5432
+    environment:
+      POSTGRES_DB: cardsdb #DB name
+    extends:
+      file: common-config.yml
+      service: microservice-db-config
+      
+###################  Loans DB SERVER ########################      
+  loansdb:
+    container_name: loansdb-ms
+    ports:
+      - 8086:5432
+    environment:
+      POSTGRES_DB: loansdb #DB name
+    extends:
+      file: common-config.yml
+      service: microservice-db-config
+
+###################  Start ALL Local SERVICE ########################
+      
+ ###################  Others ########################
+
+volumes: 
+  kafka_data:
+    driver: local
+    
+networks:
+  devsoncallNetwork: #NETWORK name inside docker
+    driver: "bridge"
