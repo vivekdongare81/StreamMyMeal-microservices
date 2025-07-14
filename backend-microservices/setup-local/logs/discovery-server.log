@@ -1,0 +1,93 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.devsoncall:eurekaserver >---------------------
+[INFO] Building eurekaserver 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.3:run (default-cli) > test-compile @ eurekaserver >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ eurekaserver ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ eurekaserver ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ eurekaserver ---
+[INFO] skip non existing resourceDirectory /home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/discovery-server/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ eurekaserver ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:3.5.3:run (default-cli) < test-compile @ eurekaserver <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.3:run (default-cli) @ eurekaserver ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.3)
+
+2025-07-12T12:53:24.941+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.d.e.EurekaserverApplication            : Starting EurekaserverApplication using Java 17.0.12 with PID 124614 (/home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/discovery-server/target/classes started by vivek-18890 in /home/vivek-18890/Downloads/tempProjs/PII_REPO/PERSONAL/GITHUB_PROJECTS/1_WORKING_LIVE/StreamMyMeal-microservices/StreamMyMeal-microservices/discovery-server)
+2025-07-12T12:53:24.943+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.d.e.EurekaserverApplication            : No active profile set, falling back to 1 default profile: "default"
+2025-07-12T12:53:24.969+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8090/
+2025-07-12T12:53:24.969+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=eurekaserver, profiles=[default], label=null, version=null, state=null
+2025-07-12T12:53:25.688+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=080f7571-1eb8-30e9-ac19-10358519e4ff
+2025-07-12T12:53:25.921+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8092 (http)
+2025-07-12T12:53:25.932+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-07-12T12:53:25.932+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2025-07-12T12:53:25.977+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-07-12T12:53:25.979+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1008 ms
+2025-07-12T12:53:26.781+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.d.provider.DiscoveryJerseyProvider   : Using JSON encoding codec LegacyJacksonJson
+2025-07-12T12:53:26.783+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.d.provider.DiscoveryJerseyProvider   : Using JSON decoding codec LegacyJacksonJson
+2025-07-12T12:53:26.900+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.d.provider.DiscoveryJerseyProvider   : Using XML encoding codec XStreamXml
+2025-07-12T12:53:26.901+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.d.provider.DiscoveryJerseyProvider   : Using XML decoding codec XStreamXml
+2025-07-12T12:53:27.045+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-07-12T12:53:27.415+05:30  WARN [eurekaserver,,] 124614 --- [eurekaserver] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2025-07-12T12:53:27.429+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2025-07-12T12:53:27.440+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2025-07-12T12:53:27.440+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] com.netflix.discovery.DiscoveryClient    : Client configured to neither register nor query for data.
+2025-07-12T12:53:27.440+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1752305007440 with initial instances count: 0
+2025-07-12T12:53:27.459+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.eureka.DefaultEurekaServerContext    : Initializing ...
+2025-07-12T12:53:27.460+05:30  WARN [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.eureka.cluster.PeerEurekaNodes       : The replica size seems to be empty. Check the route 53 DNS Registry
+2025-07-12T12:53:27.464+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.e.registry.AbstractInstanceRegistry  : Finished initializing remote region registries. All known remote regions: []
+2025-07-12T12:53:27.464+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.n.eureka.DefaultEurekaServerContext    : Initialized
+2025-07-12T12:53:27.469+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 17 endpoints beneath base path '/actuator'
+2025-07-12T12:53:27.506+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application EUREKASERVER with eureka with status UP
+2025-07-12T12:53:27.513+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] o.s.c.n.e.server.EurekaServerBootstrap   : isAws returned false
+2025-07-12T12:53:27.513+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] o.s.c.n.e.server.EurekaServerBootstrap   : Initialized server context
+2025-07-12T12:53:27.514+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Got 1 instances from neighboring DS node
+2025-07-12T12:53:27.514+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Renew threshold is: 1
+2025-07-12T12:53:27.514+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] c.n.e.r.PeerAwareInstanceRegistryImpl    : Changing status to UP
+2025-07-12T12:53:27.515+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8092 (http) with context path '/'
+2025-07-12T12:53:27.515+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [       Thread-9] e.s.EurekaServerInitializerConfiguration : Started Eureka Server
+2025-07-12T12:53:27.516+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] .s.c.n.e.s.EurekaAutoServiceRegistration : Updating port to 8092
+2025-07-12T12:53:27.529+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [           main] c.d.e.EurekaserverApplication            : Started EurekaserverApplication in 3.231 seconds (process running for 3.515)
+2025-07-12T12:53:36.982+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-12T12:53:36.982+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-07-12T12:53:36.983+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-07-12T12:53:37.137+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-3] c.n.e.registry.AbstractInstanceRegistry  : Registered instance CARDS/10.71.88.167:cards:8082 with status UP (replication=false)
+2025-07-12T12:53:37.137+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-4] c.n.e.registry.AbstractInstanceRegistry  : Registered instance ACCOUNTS/10.71.88.167:accounts:8081 with status UP (replication=false)
+2025-07-12T12:53:39.147+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-6] c.n.e.registry.AbstractInstanceRegistry  : Registered instance LOANS/10.71.88.167:loans:8083 with status UP (replication=false)
+2025-07-12T12:54:27.514+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [a-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 0ms
+2025-07-12T12:55:27.515+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [a-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 0ms
+2025-07-12T12:56:10.317+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application EUREKASERVER with eureka with status DOWN
+2025-07-12T12:56:10.320+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-12T12:56:10.325+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-1] c.n.e.registry.AbstractInstanceRegistry  : Registered instance LOANS/10.71.88.167:loans:8083 with status DOWN (replication=false)
+2025-07-12T12:56:10.325+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [nio-8092-exec-2] c.n.e.registry.AbstractInstanceRegistry  : Registered instance ACCOUNTS/10.71.88.167:accounts:8081 with status DOWN (replication=false)
+2025-07-12T12:56:10.374+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-07-12T12:56:10.376+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] o.s.c.n.e.server.EurekaServerBootstrap   : Shutting down Eureka Server..
+2025-07-12T12:56:10.377+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shutting down ...
+2025-07-12T12:56:10.377+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shut down
+2025-07-12T12:56:10.377+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] o.s.c.n.e.server.EurekaServerBootstrap   : Eureka Service is now shutdown...
+2025-07-12T12:56:10.377+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shutting down ...
+2025-07-12T12:56:10.377+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] c.n.eureka.DefaultEurekaServerContext    : Shut down
+2025-07-12T12:56:10.380+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2025-07-12T12:56:10.380+05:30  INFO [eurekaserver,,] 124614 --- [eurekaserver] [ionShutdownHook] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
