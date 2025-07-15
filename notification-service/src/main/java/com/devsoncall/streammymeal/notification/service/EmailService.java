@@ -31,7 +31,7 @@ public class EmailService {
 
             helper.setFrom(from);
             helper.setTo(toEmail);
-            helper.setSubject("Welcome to our website");
+            helper.setSubject("Welcome to StreamMyMeal");
 
             // create context
             Context context = new Context();

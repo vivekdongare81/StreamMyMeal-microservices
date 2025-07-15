@@ -1,12 +1,8 @@
 package com.devsoncall.streammymeal.restaurant.controller;
 
 
-import com.devsoncall.streammymeal.restaurant.dto.RestaurantDTO;
-import com.devsoncall.streammymeal.restaurant.exception.RestaurantNotFoundException;
-import com.devsoncall.streammymeal.restaurant.service.FileStorageService;
-import com.devsoncall.streammymeal.restaurant.service.RestaurantService;
+import java.io.IOException;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,10 +11,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import com.devsoncall.streammymeal.restaurant.dto.RestaurantDTO;
+import com.devsoncall.streammymeal.restaurant.entity.Restaurant;
+import com.devsoncall.streammymeal.restaurant.exception.RestaurantNotFoundException;
+import com.devsoncall.streammymeal.restaurant.service.FileStorageService;
+import com.devsoncall.streammymeal.restaurant.service.RestaurantService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/restaurants")
@@ -34,6 +42,17 @@ public class RestaurantController {
         return new ResponseEntity<>(createdRestaurant ,HttpStatus.CREATED);
     }
 
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable Integer restaurantId) {
+        try {
+            Restaurant restaurant = restaurantService.getRestaurantById(restaurantId);
+            RestaurantDTO dto = restaurantService.toDTO(restaurant);
+            return ResponseEntity.ok(dto);
+        } catch (RestaurantNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
     @GetMapping
     public ResponseEntity<Page<RestaurantDTO>> getAllRestaurants(@RequestParam int page,
                                                                  @RequestParam int size ,

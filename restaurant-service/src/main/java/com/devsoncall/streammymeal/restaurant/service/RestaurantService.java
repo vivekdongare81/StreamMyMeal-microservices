@@ -68,7 +68,8 @@ public class RestaurantService {
         return restaurantRepository.findAll(pageable)
                 .map(this::toDTO);
     }
-    private RestaurantDTO toDTO(Restaurant restaurant) {
+    
+    public RestaurantDTO toDTO(Restaurant restaurant) {
         String imageUrl = Optional.ofNullable(restaurant.getImage())
                 .map(fileName -> baseUrl + "/api/v1/restaurants/images/" + fileName)
                 .orElse(null);

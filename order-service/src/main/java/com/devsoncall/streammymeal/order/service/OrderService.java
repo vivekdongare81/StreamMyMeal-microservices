@@ -49,6 +49,7 @@ public class OrderService {
         order.setContactEmail(orderRequest.getContactEmail());
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setContactPhone(orderRequest.getContactPhone());
+        logger.info("Order created in"+orderRequest.toString());
 
         List<OrderItem> orderItems = orderRequest.getItems().stream()
                 .map(orderItemRequest -> {
@@ -61,11 +62,13 @@ public class OrderService {
                     return orderItem;
                 })
                 .collect(Collectors.toList());
+        logger.info("Order created in 1");
 
         order.setOrderItems(orderItems);
         BigDecimal subtotal = orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        logger.info("Order created in 2");
 
         // calculate tax
         BigDecimal tax = subtotal.multiply(Constants.TAX_RATE);
