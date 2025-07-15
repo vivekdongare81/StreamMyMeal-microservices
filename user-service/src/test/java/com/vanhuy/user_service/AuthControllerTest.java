@@ -1,9 +1,10 @@
 package com.vanhuy.user_service;
 
+import com.devsoncall.streammymeal.users.dto.RegisterRequest;
+import com.devsoncall.streammymeal.users.dto.RegisterResponse;
+import com.devsoncall.streammymeal.users.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vanhuy.user_service.dto.RegisterRequest;
-import com.vanhuy.user_service.dto.RegisterResponse;
-import com.vanhuy.user_service.service.AuthService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
