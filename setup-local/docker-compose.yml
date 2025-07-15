@@ -13,28 +13,42 @@ services:
     extends:
       file: common-config.yml
       service: network-deploy-service
+      
 ###################  Kafka service ########################
   kafka:
-    image: confluentinc/cp-kafka:latest
-    container_name: kafka
+    image: docker.io/bitnami/kafka:3.9
     ports:
-      - "29092:9092"
+      - "29092:9092" #9092:9092
+    volumes:
+      - "kafka_data:/bitnami"
     environment:
-      KAFKA_KRAFT_MODE: "true"
-      KAFKA_PROCESS_ROLES: "broker,controller"
-      KAFKA_NODE_ID: "1"
-      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
-      KAFKA_LISTENERS: "PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:29092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
-      KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
-      CLUSTER_ID: "my-cluster-id"
+      # Kraft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      
+      # ADVERTISED Listners default
+      # KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      
+      # Kafka local - 9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:29092 #9092
+
+      # Kafka docker - 9092
+      #- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+
+      # Kafka docker + local - 9092 9093
+      #- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT://localhost:9093
+
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
     extends:
       file: common-config.yml
       service: network-deploy-service
-
+      
 ###################  Users DB SERVICE ########################
   allinoneDB: 
     container_name: allinoneDB

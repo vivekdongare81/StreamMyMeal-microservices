@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationKafkaConsumer {//    Kafka Consumer để lắng nghe và xử lý các yêu cầu email cũng như send notification qua websocket
-
+public class NotificationKafkaConsumer {
+	//Kafka Consumer to listen for and handle email requests, as well as send notifications via WebSocket
+	
     private final static Logger logger = LoggerFactory.getLogger(NotificationKafkaConsumer .class);
     private final EmailService emailService;
 

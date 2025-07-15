@@ -93,7 +93,7 @@
                 <li><strong>Recipient Name:</strong> <span th:text="${recipientName}">John Doe</span></li>
                 <li><strong>Shipping Address:</strong> <span th:text="${shippingAddress}">123 Main St, Springfield</span></li>
                 <li><strong>Contact Phone:</strong> <span th:text="${contactPhone}">+1234567890</span></li>
-                <li><strong>Total Amount:</strong> $<span th:text="${totalAmount}">99.99</span></li>
+                <li><strong>Total Amount:</strong> <span th:text="${totalAmount}">99.99</span> ₹</li>
             </ul>
         </div>
 
@@ -106,7 +106,7 @@
                         <strong th:text="${item.quantity}"></strong> x
                         <span th:text="${item.menuItemId}"></span>
                     </span>
-                    <span>$<span th:text="${item.subtotal}"></span></span>
+                    <span><span th:text="${item.subtotal}"> ₹</span></span>
                 </li>
             </ul>
         </div>
@@ -116,7 +116,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>&copy; 2024 Your Company Name | All Rights Reserved</p>
+        <p>&copy; 2025 StreamMyMeal | All Rights Reserved</p>
     </div>
 </div>
 </body>
