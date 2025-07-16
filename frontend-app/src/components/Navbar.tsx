@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { CartService } from "@/services";
+import { useAuth } from "@/lib/authContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = () => {
   const [cartItemCount, setCartItemCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const updateCartCount = () => {
@@ -44,6 +46,11 @@ const Navbar = () => {
 
   const handleCartClick = () => {
     navigate('/checkout');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -126,18 +133,23 @@ const Navbar = () => {
               )}
             </Button>
             
-            <Link to="/auth">
-              <Button variant="ghost" size="sm">
-                <User className="w-4 h-4 mr-2" />
-                Sign In
-              </Button>
-            </Link>
-            
-            <Link to="/profile">
-              <Button size="sm">
-                Profile
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/profile">
+                  <Button size="sm">Profile</Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm">
+                  <User className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -202,20 +214,31 @@ const Navbar = () => {
                 Admin
               </Link>
               <div className="border-t pt-2 mt-2">
-                <Link
-                  to="/auth"
-                  className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/profile"
-                  className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Profile
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-muted rounded-md"
+                      onClick={() => { setIsMenuOpen(false); handleLogout(); }}
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                )}
               </div>
             </div>
           </div>
