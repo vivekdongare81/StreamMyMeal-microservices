@@ -44,7 +44,7 @@ export function useCart() {
 
   // Update item quantity
   const updateQuantity = (itemId: string, quantity: number) => {
-    CartService.updateQuantity(itemId, quantity);
+    CartService.updateCartItemQuantity(itemId, quantity);
   };
 
   // Clear the cart

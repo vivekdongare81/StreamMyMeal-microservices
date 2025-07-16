@@ -1,0 +1,3068 @@
+{
+	"info": {
+		"_postman_id": "cf2919eb-5af7-437f-8a3a-e1ac67c4237b",
+		"name": "StreamMyMeal - Postman Apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30244106"
+	},
+	"item": [
+		{
+			"name": "users / auth - server",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "Register User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"password\": \"password123\",\n    \"address\": \"chennai gudvanchhery 32110\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/auth/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"register"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "aaa",
+											"disabled": true
+										},
+										{
+											"key": "email",
+											"value": "aaa",
+											"disabled": true
+										},
+										{
+											"key": "password",
+											"value": "aaaa",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Log in",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"password\":\"password123\"\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/auth/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "validateToken",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser1\",\n    \"password\":\"password123\"\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/auth/validateToken?token=eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"validateToken"
+									],
+									"query": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "forgot password by email",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"dongarevivek81@gmail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/auth/forgot",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"forgot"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "reset password by token from email message",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"90055fe7-e369-4e04-955d-122bfb8e1a78\",\n    \"newPassword\":\"password1234\"\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/auth/reset",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"reset"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "Create User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User by Admin",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/4",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deactivate User by Admin",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/4/deactivate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"4",
+										"deactivate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reactivate User by Admin",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/4/reactivate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"4",
+										"reactivate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by auth token",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/profile",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"profile"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by userName",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/username/testuser1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"username",
+										"testuser1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by  userID by Admin",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User by userID Copy 2",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/username/testuser1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"username",
+										"testuser1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Users by Admin",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/?includeInactive=false&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										""
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "false"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/profile",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"profile"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/0",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"0"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User Profile Image",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/profile/image/cacasc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"profile",
+										"image",
+										"cacasc"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User Profile Image Copy",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8081/api/v1/users/profile/image/cacasc",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8081",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"profile",
+										"image",
+										"cacasc"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "restaurants / menu -server",
+			"item": [
+				{
+					"name": "restaurant",
+					"item": [
+						{
+							"name": "Create Restaurents",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Tasty Bites\",\n    \"address\": \"123 Food Street, Cuisine City\",\n    \"image\": \"restaurant1.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Image by restaurantID",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/home/vivek-18890/Pictures/Screenshots/Screenshot from 2025-07-15 14-56-00.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants/2/upload-image",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants",
+										"2",
+										"upload-image"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Specific Restaurent by restaurantID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants",
+										"1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Restaurents by pages",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants?page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Restaurents by keyword",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants?page=0&size=10&keyword=tasty",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "keyword",
+											"value": "tasty"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Restaurent Image by Filename",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/restaurants/images/17447a50-167d-42c8-83e8-e9fb0114b652.png",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"restaurants",
+										"images",
+										"17447a50-167d-42c8-83e8-e9fb0114b652.png"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "menu",
+					"item": [
+						{
+							"name": "Create Menu by restaurantID",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Margherita Pizza 3\",\n    \"description\": \"Classic pizza with tomato sauce and mozzarella\",\n    \"price\": 12.99,\n    \"stock\": 50,\n    \"imageUrl\": \"pizza.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/menu-items/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"menu-items",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Image by menuID",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/home/vivek-18890/Pictures/Screenshots/Screenshot from 2025-07-14 13-20-31.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/menu-items/1/upload-image",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"menu-items",
+										"1",
+										"upload-image"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Menu Items by restaurantID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/menu-items/restaurant/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"menu-items",
+										"restaurant",
+										"1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Menu Price by menuID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/menu-items/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"menu-items",
+										"1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Menu Image by Filename",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8082/api/v1/menu-items/images/37882cb4-e946-416d-9899-6a4d8072c7eb.png",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8082",
+									"path": [
+										"api",
+										"v1",
+										"menu-items",
+										"images",
+										"37882cb4-e946-416d-9899-6a4d8072c7eb.png"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "orders-server",
+			"item": [
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 101,\n  \"recipientName\": \"Rahul Sharma\",\n  \"contactEmail\": \"dongarevivek81@gmail.com\",\n  \"shippingAddress\": \"221B Baker Street, Mumbai, India\",\n  \"contactPhone\": \"+91-9876543210\",\n  \"items\": [\n    {\n      \"menuItemId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"menuItemId\": 3,\n      \"quantity\": 1\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8083/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User orders by orderID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8083/api/v1/orders/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"1"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "vicky",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Orders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8083/api/v1/orders?page=0&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notification-server",
+			"item": [
+				{
+					"name": "Send welcome email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"toEmail\":\"dongarevivek81@gmail.com\",\n    \"username\":\"vivek username\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/api/v1/notifications/welcome-email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"notifications",
+								"welcome-email"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "vicky",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send order successful email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": 101,\n  \"userId\": 2001,\n  \"orderDate\": \"2025-07-15T15:00:00\",\n  \"totalAmount\": 499.99,\n  \"status\": \"DELIVERED\",\n  \"paymentStatus\": \"PAID\",\n  \"recipientName\": \"Alice Johnson\",\n  \"contactEmail\": \"dongarevivek81@gmail.com\",\n  \"shippingAddress\": \"456 Elm Street, Springfield\",\n  \"contactPhone\": \"9823367357\",\n  \"items\": [\n    {\n      \"orderItemId\": 1,\n      \"menuItemId\": 1010,\n      \"quantity\": 2,\n      \"subtotal\": 299.99\n    },\n    {\n      \"orderItemId\": 2,\n      \"menuItemId\": 2020,\n      \"quantity\": 1,\n      \"subtotal\": 200.00\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/api/v1/notifications/order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"notifications",
+								"order"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "vicky",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send reset password email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"toEmail\": \"dongarevivek81@gmail.com\",\n  \"templateId\": \"forgot-password-topic\",\n  \"templateData\": {\n    \"username\": \"user123\",\n    \"resetLink\": \"https://streammymeal.com/reset?token=abc123\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8084/api/v1/notifications/reset-password-email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8084",
+							"path": [
+								"api",
+								"v1",
+								"notifications",
+								"reset-password-email"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "vicky",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API gateway - 9000",
+			"item": [
+				{
+					"name": "users / auth - server Copy",
+					"item": [
+						{
+							"name": "auth",
+							"item": [
+								{
+									"name": "Register User",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"password\": \"password123\",\n    \"address\": \"chennai gudvanchhery 32110\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/auth/register",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"auth",
+												"register"
+											],
+											"query": [
+												{
+													"key": "username",
+													"value": "aaa",
+													"disabled": true
+												},
+												{
+													"key": "email",
+													"value": "aaa",
+													"disabled": true
+												},
+												{
+													"key": "password",
+													"value": "aaaa",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Log in",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"password\":\"password123\"\n\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/auth/login",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"auth",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "validateToken",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser1\",\n    \"password\":\"password123\"\n\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/auth/validateToken?token=eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTE0MzEsImV4cCI6MTgzODk5MTQzMX0.DhoAeQ7jivecuatNhZS2IuTyZu-9FnJQWffr2KRxa7Y",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"auth",
+												"validateToken"
+											],
+											"query": [
+												{
+													"key": "token",
+													"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTE0MzEsImV4cCI6MTgzODk5MTQzMX0.DhoAeQ7jivecuatNhZS2IuTyZu-9FnJQWffr2KRxa7Y"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "forgot password by email",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"dongarevivek81@gmail.com\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/auth/forgot",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"auth",
+												"forgot"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "reset password by token from email message",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"token\": \"90055fe7-e369-4e04-955d-122bfb8e1a78\",\n    \"newPassword\":\"password1234\"\n\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/auth/reset",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"auth",
+												"reset"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "user",
+							"item": [
+								{
+									"name": "Create User",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:8081/api/v1/users",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8081",
+											"path": [
+												"api",
+												"v1",
+												"users"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update User by Admin",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/4",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Deactivate User by Admin",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/4/deactivate",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"4",
+												"deactivate"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reactivate User by Admin",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"userId\": 100,\n  \"username\": \"vivek_dongare_rename\",\n  \"email\": \"admin@gmail.com\",\n  \"password\": \"admin\",\n  \"address\": \"123 Main Street, Chennai, India\",\n  \"profileImageName\": \"vivek_profile.jpg\",\n  \"roles\": [\"USER\", \"ADMIN\"],\n  \"isActive\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/4/reactivate",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"4",
+												"reactivate"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User by auth token",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/profile",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"profile"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User by userName",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/username/testuser1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"username",
+												"testuser1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User by  userID by Admin",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/username/testuser1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"username",
+												"testuser1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get User by userID Copy 2",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/username/testuser1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"username",
+												"testuser1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get All Users by Admin",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI2NzU4NzksImV4cCI6MTgzOTA3NTg3OX0.MWxV7kqGyARyCzvUpVKgj4JCVb7a7w3-ncV_dLyQvYI",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/?page=0&size=10",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												""
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "0"
+												},
+												{
+													"key": "size",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update User",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/profile",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"profile"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete User",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete User Profile Image",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/profile/image/cacasc",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"profile",
+												"image",
+												"cacasc"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete User Profile Image Copy",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlcjIiLCJpYXQiOjE3NTI1OTIxNzUsImV4cCI6MTgzODk5MjE3NX0.vCWNhpBHx3RgQGV7RM198IWLKwXskGvz9iH5TbgIjFo",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"username\": \"testuser2\",\n    \"email\": \"dongarevivek81@gmail.com\",\n    \"address\": \"new address \",\n    \"profileImageUrl\": \"aa\",\n    \"newJwtToken\": null\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/users/profile/image/cacasc",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"profile",
+												"image",
+												"cacasc"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "restaurants / menu -server Copy",
+					"item": [
+						{
+							"name": "restaurant",
+							"item": [
+								{
+									"name": "Create Restaurents",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Tasty Bites\",\n    \"address\": \"123 Food Street, Cuisine City\",\n    \"image\": \"restaurant1.jpg\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Image by restaurantID",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/home/vivek-18890/Pictures/Screenshots/Screenshot from 2025-07-15 14-56-00.png"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants/2/upload-image",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants",
+												"2",
+												"upload-image"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Specific Restaurent by restaurantID",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants",
+												"1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get All Restaurents by pages",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants?page=0&size=10",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "0"
+												},
+												{
+													"key": "size",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get All Restaurents by keyword",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants?page=0&size=10&keyword=tasty",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "0"
+												},
+												{
+													"key": "size",
+													"value": "10"
+												},
+												{
+													"key": "keyword",
+													"value": "tasty"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Restaurent Image by Filename",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/restaurants/images/17447a50-167d-42c8-83e8-e9fb0114b652.png",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"restaurants",
+												"images",
+												"17447a50-167d-42c8-83e8-e9fb0114b652.png"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "menu",
+							"item": [
+								{
+									"name": "Create Menu by restaurantID",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Margherita Pizza 3\",\n    \"description\": \"Classic pizza with tomato sauce and mozzarella\",\n    \"price\": 12.99,\n    \"stock\": 50,\n    \"imageUrl\": \"pizza.jpg\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/menu-items/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"menu-items",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Image by menuID",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/home/vivek-18890/Pictures/Screenshots/Screenshot from 2025-07-14 13-20-31.png"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/menu-items/1/upload-image",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"menu-items",
+												"1",
+												"upload-image"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get All Menu Items by restaurantID",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/menu-items/restaurant/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"menu-items",
+												"restaurant",
+												"1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Menu Price by menuID",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/menu-items/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"menu-items",
+												"1"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Menu Image by Filename",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aWNreTEiLCJpYXQiOjE3NTE4OTUyNTUsImV4cCI6MTc1MTg5NzA1NX0.v6rnV8wFy3RJr9X_hKc8TQ6-38SgSh3kuCqJe_Wsbo4",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:9000/api/v1/menu-items/images/37882cb4-e946-416d-9899-6a4d8072c7eb.png",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "9000",
+											"path": [
+												"api",
+												"v1",
+												"menu-items",
+												"images",
+												"37882cb4-e946-416d-9899-6a4d8072c7eb.png"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "vicky",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "orders-server Copy",
+					"item": [
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNDc1OCwiZXhwIjoxODM4OTA0NzU4fQ.1IMdcuYvpg7juDKwCX2pSTbPOdwzGS4Bo9QQPjz6Nnw",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 101,\n  \"recipientName\": \"Rahul Sharma\",\n  \"contactEmail\": \"dongarevivek81@gmail.com\",\n  \"shippingAddress\": \"221B Baker Street, Mumbai, India\",\n  \"contactPhone\": \"+91-9876543210\",\n  \"items\": [\n    {\n      \"menuItemId\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"menuItemId\": 3,\n      \"quantity\": 1\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/orders",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User orders by orderID",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/orders/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"orders",
+										"1"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Orders",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/orders?page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"orders"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "notification-server Copy",
+					"item": [
+						{
+							"name": "Send welcome email",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"toEmail\":\"dongarevivek81@gmail.com\",\n    \"username\":\"vivek username\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/notifications/welcome-email",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"notifications",
+										"welcome-email"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send order successful email",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"orderId\": 101,\n  \"userId\": 2001,\n  \"orderDate\": \"2025-07-15T15:00:00\",\n  \"totalAmount\": 499.99,\n  \"status\": \"DELIVERED\",\n  \"paymentStatus\": \"PAID\",\n  \"recipientName\": \"Alice Johnson\",\n  \"contactEmail\": \"dongarevivek81@gmail.com\",\n  \"shippingAddress\": \"456 Elm Street, Springfield\",\n  \"contactPhone\": \"9823367357\",\n  \"items\": [\n    {\n      \"orderItemId\": 1,\n      \"menuItemId\": 1010,\n      \"quantity\": 2,\n      \"subtotal\": 299.99\n    },\n    {\n      \"orderItemId\": 2,\n      \"menuItemId\": 2020,\n      \"quantity\": 1,\n      \"subtotal\": 200.00\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/notifications/order",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"notifications",
+										"order"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Send reset password email",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjUwNTAwMiwiZXhwIjoxODM4OTA1MDAyfQ.rv0HrOQURD7EJBbF0ldLgrXAQYg9s3_xRJ7H1QZX7pk",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"toEmail\":\"dongarevivek81@gmail.com\",\n    \"username\":\"vivek username\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:9000/api/v1/notifications/reset-password-email",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9000",
+									"path": [
+										"api",
+										"v1",
+										"notifications",
+										"reset-password-email"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "vicky",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
