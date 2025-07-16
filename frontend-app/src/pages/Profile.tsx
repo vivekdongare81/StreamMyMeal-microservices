@@ -5,15 +5,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
+import { useEffect, useState } from "react";
+import { userService, ProfileResponse } from "@/services";
 
 const Profile = () => {
-  const mockUser = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+91 98765 43210",
-    totalOrders: 24,
-    favoriteRestaurants: 8
-  };
+  const [userData, setUserData] = useState<ProfileResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Not authenticated');
+        const profile = await userService.getProfile(token);
+        setUserData(profile);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+  if (!userData) return null;
 
   const recentOrders = [
     { id: "1", restaurant: "Spice Garden", items: "Butter Chicken, Naan", total: 530, date: "2 days ago", status: "Delivered" },
@@ -35,18 +55,18 @@ const Profile = () => {
                 <Avatar className="w-24 h-24 mx-auto mb-4">
                   <AvatarImage src="" />
                   <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                    {mockUser.name.split(' ').map(n => n[0]).join('')}
+                    {userData.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-xl font-bold mb-2">{mockUser.name}</h2>
-                <p className="text-muted-foreground mb-4">{mockUser.email}</p>
+                <h2 className="text-xl font-bold mb-2">{userData.name}</h2>
+                <p className="text-muted-foreground mb-4">{userData.email}</p>
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">{mockUser.totalOrders}</div>
+                    <div className="text-2xl font-bold text-primary">{userData.totalOrders}</div>
                     <div className="text-sm text-muted-foreground">Total Orders</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">{mockUser.favoriteRestaurants}</div>
+                    <div className="text-2xl font-bold text-primary">{userData.favoriteRestaurants}</div>
                     <div className="text-sm text-muted-foreground">Favorites</div>
                   </div>
                 </div>

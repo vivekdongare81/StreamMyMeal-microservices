@@ -1,26 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { currentUser } from "@/data";
+import { userService, ProfileResponse } from "@/services";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
   const [editMode, setEditMode] = useState(false);
-  const [userData, setUserData] = useState({
-    name: currentUser.name,
-    email: currentUser.email,
-    phone: currentUser.phone,
-    preferences: [...currentUser.preferences.cuisine],
-    dietaryRestrictions: [...currentUser.preferences.dietaryRestrictions]
-  });
+  const [userData, setUserData] = useState<ProfileResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    // In a real app, you would update the user data via an API
-    console.log('Saving user data:', userData);
-    setEditMode(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Not authenticated');
+        const profile = await userService.getProfile(token);
+        setUserData(profile);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleSave = async () => {
+    if (!userData) return;
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
+      const updated = await userService.updateProfile(token, userData);
+      setUserData(updated);
+      setEditMode(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update profile');
+    }
   };
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+  if (!userData) return null;
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -103,7 +128,7 @@ export default function ProfilePage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {currentUser.address.map((addr, index) => (
+              {userData.address.map((addr, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div>
