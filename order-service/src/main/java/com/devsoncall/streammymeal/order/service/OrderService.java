@@ -81,6 +81,7 @@ public class OrderService {
         // send order notification
         OrderResponse orderResponse = orderToOrderResponse(savedOrder);
         sendOrderNotification(orderResponse);
+        logger.info("Notification sent");
 
         return orderResponse;
     }
@@ -102,6 +103,10 @@ public class OrderService {
         return orderToOrderResponse(order);
     }
 
+    public Page<OrderResponse> getOrdersByUser(Integer userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable)
+            .map(this::orderToOrderResponse);
+    }
 
     private OrderResponse orderToOrderResponse(Order order) {
         OrderResponse response = new OrderResponse();

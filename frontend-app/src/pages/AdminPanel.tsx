@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import { RestaurantService } from "@/services";
 import { toast } from "sonner";
 import { MenuService } from "@/services/menuService";
+import { Restaurant } from "@/data/types";
 
 const AdminPanel = () => {
   const [tab, setTab] = useState("restaurant");
@@ -12,6 +13,11 @@ const AdminPanel = () => {
   const [newMenu, setNewMenu] = useState({ restaurantId: "", name: "", price: "", image: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [menuImageFile, setMenuImageFile] = useState<File | null>(null);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+
+  useEffect(() => {
+    RestaurantService.getRestaurants().then(setRestaurants);
+  }, []);
 
   const handleAddRestaurant = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +92,25 @@ const AdminPanel = () => {
             <Button type="submit">Add Menu Item</Button>
           </form>
         )}
+        <div className="mb-8 mt-12"> {/* Added mt-12 for extra space above */}
+          <h2 className="text-2xl font-semibold mb-2">Listed Restaurants</h2>
+          <table className="min-w-full border text-left mb-4">
+            <thead>
+              <tr>
+                <th className="border px-4 py-2">Restaurant Name</th>
+                <th className="border px-4 py-2">Restaurant ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {restaurants.map(r => (
+                <tr key={r.id}>
+                  <td className="border px-4 py-2">{r.name}</td>
+                  <td className="border px-4 py-2">{r.id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -16,14 +16,12 @@ export interface AuthResponse {
 }
 
 export interface ProfileResponse {
-  id: string;
-  name: string;
+  userId: number; // <-- ensure this matches backend type
+  username: string;
   email: string;
-  phone: string;
-  avatar?: string;
-  address?: any[];
-  paymentMethod?: string;
-  preferences?: any;
+  address?: string;
+  profileImageUrl?: string;
+  newJwtToken?: string;
 }
 
 const API_BASE = '/api/v1';
@@ -45,7 +43,14 @@ export const userService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, email, password, address })
     });
-    if (!res.ok) throw new Error('Registration failed');
+    if (!res.ok) {
+      let errorMsg = 'Registration failed';
+      try {
+        const data = await res.json();
+        errorMsg = data.message || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
+    }
     return res.json();
   },
 

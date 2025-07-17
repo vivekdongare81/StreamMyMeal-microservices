@@ -18,26 +18,26 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <AuthProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/restaurants" element={<RestaurantList />} />
-            <Route path="/live/:restaurantId" element={<LiveStreaming />} />
-            <Route path="/live" element={<LiveStreaming />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/menu/:restaurantId" element={<Menu />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/restaurants" element={<RestaurantList />} />
+          <Route path="/live/:restaurantId" element={<LiveStreaming />} />
+          <Route path="/live" element={<LiveStreaming />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/menu/:restaurantId" element={<Menu />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
   </AuthProvider>
 );
 

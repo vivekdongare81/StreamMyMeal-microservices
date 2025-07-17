@@ -33,9 +33,6 @@ public class UserMapper {
         user.setProfileImageName(userDTO.getProfileImageName());
         user.setRoles(userDTO.getRoles());
         user.setActive(userDTO.isActive());
-        if (userDTO.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
         return user;
     }
 }

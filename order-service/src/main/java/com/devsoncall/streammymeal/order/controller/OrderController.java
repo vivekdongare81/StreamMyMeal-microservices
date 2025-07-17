@@ -46,4 +46,15 @@ public class OrderController {
         Page<OrderResponse> orders = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<OrderResponse>> getOrdersByUser(
+        @PathVariable Integer userId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<OrderResponse> orders = orderService.getOrdersByUser(userId, pageable);
+        return ResponseEntity.ok(orders);
+    }
 }

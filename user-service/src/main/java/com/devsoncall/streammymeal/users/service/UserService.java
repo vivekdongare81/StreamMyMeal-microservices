@@ -99,9 +99,6 @@ public class UserService {
         if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
             user.setRoles(dto.getRoles());
         }
-        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
         if (dto.isActive() != user.isActive()) {
             user.setActive(dto.isActive());
         }

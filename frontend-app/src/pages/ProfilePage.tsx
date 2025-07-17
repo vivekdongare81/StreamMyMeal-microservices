@@ -22,8 +22,8 @@ export default function ProfilePage() {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Not authenticated');
         const profile = await userService.getProfile(token);
+        devLog('[ProfilePage] Profile loaded:', profile); // Log the full profile object
         setUserData(profile);
-        devLog('[ProfilePage] Profile loaded:', profile);
       } catch (err: any) {
         setError(err.message || 'Failed to load profile');
         devError('[ProfilePage] Failed to fetch profile:', err);
@@ -42,7 +42,7 @@ export default function ProfilePage() {
       if (!token) throw new Error('Not authenticated');
       const updated = await userService.updateProfile(token, userData);
       setUserData(updated);
-      setEditMode(false);
+    setEditMode(false);
       devLog('[ProfilePage] Profile updated successfully:', updated);
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
@@ -76,11 +76,11 @@ export default function ProfilePage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
-                  id="name"
-                  value={userData.name}
-                  onChange={(e) => setUserData({...userData, name: e.target.value})}
+                  id="username"
+                  value={userData.username}
+                  onChange={(e) => setUserData({...userData, username: e.target.value})}
                   disabled={!editMode}
                   className="mt-1"
                 />
@@ -97,12 +97,14 @@ export default function ProfilePage() {
                 />
               </div>
               
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
+              {/* Remove phone field as it's not present in ProfileResponse */}
+
+              <div className="md:col-span-2">
+                <Label>Address</Label>
                 <Input
-                  id="phone"
-                  value={userData.phone}
-                  onChange={(e) => setUserData({...userData, phone: e.target.value})}
+                  id="address"
+                  value={userData.address || ''}
+                  onChange={(e) => setUserData({...userData, address: e.target.value})}
                   disabled={!editMode}
                   className="mt-1"
                 />
@@ -130,31 +132,18 @@ export default function ProfilePage() {
         <TabsContent value="addresses">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Saved Addresses</h2>
-              <Button>Add New Address</Button>
+              <h2 className="text-xl font-semibold">Saved Address</h2>
             </div>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {userData.address.map((addr, index) => (
-                <div key={index} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">
-                        {addr.isDefault && (
-                          <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded mr-2">
-                            Default
-                          </span>
-                        )}
-                        {addr.street}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {addr.city}, {addr.state} - {addr.zipCode}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm">Edit</Button>
+              <div className="border rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">
+                      {userData.address || 'No address on file'}
+                    </h3>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </TabsContent>
