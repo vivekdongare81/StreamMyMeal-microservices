@@ -37,17 +37,17 @@ public class AuthService {
 
     public AuthResponse authenticate(LoginRequest loginRequest) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-            );
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String jwt = jwtUtil.generateToken(userDetails);
-            log.info("User {} logged in successfully", loginRequest.getUsername());
+            User user = userRepository.findByEmailAndIsActiveTrue(loginRequest.getEmail())
+                .orElseThrow(() -> new AuthException("Invalid email or password"));
+            if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                throw new AuthException("Invalid email or password");
+            }
+            String jwt = jwtUtil.generateToken(user);
+            log.info("User {} logged in successfully", loginRequest.getEmail());
             return new AuthResponse(jwt);
         } catch (Exception e) {
-            log.warn("Authentication failed for user: {}", loginRequest.getUsername());
-            throw new AuthException("Invalid username or password");
+            log.warn("Authentication failed for email: {}", loginRequest.getEmail());
+            throw new AuthException("Invalid email or password");
         }
     }
 
