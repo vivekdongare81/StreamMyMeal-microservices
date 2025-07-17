@@ -14,10 +14,33 @@ const AdminPanel = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [menuImageFile, setMenuImageFile] = useState<File | null>(null);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const PAGE_SIZE = 10;
+
+  const loadRestaurants = async (pageNum = 0) => {
+    const res = await fetch(`/api/v1/restaurants?page=${pageNum}&size=${PAGE_SIZE}`);
+    const data = await res.json();
+    setRestaurants(data.content.map((r: any) => ({
+      id: String(r.id ?? r.restaurantId),
+      name: r.name,
+      address: r.address,
+      image: r.image,
+      cuisine: r.cuisine ?? '',
+      rating: r.rating ?? 0,
+      deliveryTime: r.deliveryTime ?? '',
+      location: r.location ?? '',
+      isLive: r.isLive ?? false,
+      viewers: r.viewers ?? 0,
+      priceRange: r.priceRange ?? '',
+    })));
+    setTotalPages(data.totalPages);
+    setPage(data.number);
+  };
 
   useEffect(() => {
-    RestaurantService.getRestaurants().then(setRestaurants);
-  }, []);
+    loadRestaurants(page);
+  }, [page]);
 
   const handleAddRestaurant = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,15 +49,29 @@ const AdminPanel = () => {
       const created = await RestaurantService.createRestaurant({
         name: newRestaurant.name,
         address: newRestaurant.address,
-        image: imageFile ? imageFile.name : undefined,
       });
-      // 2. If image file selected, upload image
-      if (imageFile) {
-        await RestaurantService.uploadRestaurantImage(created.id, imageFile);
+      // 2. If image file selected, upload image using the correct ID
+      const restaurantId = created.restaurantId || created.id;
+      if (imageFile && restaurantId) {
+        await RestaurantService.uploadRestaurantImage(restaurantId, imageFile);
       }
       toast.success("Restaurant added successfully!");
       setNewRestaurant({ name: "", address: "" });
       setImageFile(null);
+      // Prepend the new restaurant to the list
+      setRestaurants(prev => [{
+        id: String(restaurantId),
+        name: created.name,
+        address: created.address,
+        image: created.image ?? '',
+        cuisine: created.cuisine ?? '',
+        rating: created.rating ?? 0,
+        deliveryTime: created.deliveryTime ?? '',
+        location: created.location ?? '',
+        isLive: created.isLive ?? false,
+        viewers: created.viewers ?? 0,
+        priceRange: created.priceRange ?? '',
+      }, ...prev]);
     } catch (err: any) {
       toast.error(err.message || "Failed to add restaurant");
     }
@@ -61,6 +98,16 @@ const AdminPanel = () => {
       setMenuImageFile(null);
     } catch (err: any) {
       toast.error(err.message || "Failed to add menu item");
+    }
+  };
+
+  const handleDeleteRestaurant = async (restaurantId: string) => {
+    try {
+      await RestaurantService.deleteRestaurant(restaurantId);
+      setRestaurants(prev => prev.filter(r => r.id !== restaurantId));
+      toast.success('Restaurant deleted successfully!');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete restaurant');
     }
   };
 
@@ -99,6 +146,7 @@ const AdminPanel = () => {
               <tr>
                 <th className="border px-4 py-2">Restaurant Name</th>
                 <th className="border px-4 py-2">Restaurant ID</th>
+                <th className="border px-4 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -106,10 +154,20 @@ const AdminPanel = () => {
                 <tr key={r.id}>
                   <td className="border px-4 py-2">{r.name}</td>
                   <td className="border px-4 py-2">{r.id}</td>
+                  <td className="border px-4 py-2">
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteRestaurant(r.id)}>
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <div className="flex gap-2">
+            <Button disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</Button>
+            <span>Page {page + 1} of {totalPages}</span>
+            <Button disabled={page === totalPages - 1} onClick={() => setPage(page + 1)}>Next</Button>
+          </div>
         </div>
       </div>
     </div>

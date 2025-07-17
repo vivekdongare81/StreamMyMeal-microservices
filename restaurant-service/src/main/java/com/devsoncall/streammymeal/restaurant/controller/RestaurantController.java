@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,8 @@ import com.devsoncall.streammymeal.restaurant.entity.Restaurant;
 import com.devsoncall.streammymeal.restaurant.exception.RestaurantNotFoundException;
 import com.devsoncall.streammymeal.restaurant.service.FileStorageService;
 import com.devsoncall.streammymeal.restaurant.service.RestaurantService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import lombok.RequiredArgsConstructor;
 
@@ -75,6 +78,17 @@ public class RestaurantController {
             return ResponseEntity.notFound().build();
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{restaurantId}")
+    // @PreAuthorize("hasRole('ADMIN')")// not needed , handles in security config
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable Integer restaurantId) {
+        try {
+            restaurantService.deleteRestaurantById(restaurantId);
+            return ResponseEntity.noContent().build();
+        } catch (RestaurantNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

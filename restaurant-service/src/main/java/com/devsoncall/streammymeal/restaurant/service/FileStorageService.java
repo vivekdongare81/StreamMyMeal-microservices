@@ -87,6 +87,57 @@ public class FileStorageService {
         }
     }
 
+    // --- MENU IMAGE SUPPORT ---
+    public String uploadMenuImage(MultipartFile file, String oldFileName) {
+        validateFile(file);
+        Path menuDir = this.fileStorageLocation.resolve("menu");
+        try {
+            Files.createDirectories(menuDir);
+        } catch (IOException ex) {
+            throw new FileStorageException("Could not create menu image directory.", ex);
+        }
+        // Delete old file if it exists
+        if (oldFileName != null && !oldFileName.isEmpty()) {
+            deleteMenuImage(oldFileName);
+        }
+        String fileName = generateUniqueFileName(file);
+        try {
+            Path targetLocation = menuDir.resolve(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            return fileName;
+        } catch (IOException ex) {
+            throw new FileStorageException("Could not store menu file " + fileName + ". Please try again!", ex);
+        }
+    }
+
+    public void deleteMenuImage(String fileName) {
+        Path menuDir = this.fileStorageLocation.resolve("menu");
+        try {
+            Path filePath = menuDir.resolve(fileName).normalize();
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                log.info("Successfully deleted menu file: {}", fileName);
+            }
+        } catch (IOException ex) {
+            log.error("Error deleting menu file: {}", fileName, ex);
+        }
+    }
+
+    public Resource getMenuImage(String fileName) {
+        Path menuDir = this.fileStorageLocation.resolve("menu");
+        try {
+            Path filePath = menuDir.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new ResourceNotFoundException("Menu file not found: " + fileName);
+            }
+        } catch (IOException ex) {
+            throw new ResourceNotFoundException("Menu file not found: " + fileName);
+        }
+    }
+
 
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {

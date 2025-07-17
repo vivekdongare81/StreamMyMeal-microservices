@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { RestaurantService, MenuService, CartService, Restaurant, MenuItem, CartItem } from "@/services";
+import { menuItemsData as dummyMenuItems } from '../data/menuItems';
 
 const Menu = () => {
   const { restaurantId } = useParams();
@@ -20,26 +21,32 @@ const Menu = () => {
   useEffect(() => {
     const loadData = async () => {
       if (!restaurantId) return;
-      
       try {
-      const [restaurantData, menuData] = await Promise.all([
-        RestaurantService.getRestaurantById(restaurantId),
-        MenuService.getMenuByRestaurantId(restaurantId)
-      ]);
-        
+        const [restaurantData, menuData] = await Promise.all([
+          RestaurantService.getRestaurantById(restaurantId),
+          MenuService.getMenuByRestaurantId(restaurantId)
+        ]);
         setRestaurant(restaurantData);
-        setMenuItems(menuData);
-        
+        // Merge backend and dummy data (append dummy if not present)
+        const dummy = dummyMenuItems[restaurantId] || [];
+        const merged = [
+          ...menuData,
+          ...dummy.filter(
+            d => !menuData.some(m => m.name === d.name)
+          )
+        ];
+        setMenuItems(merged);
         // Load existing cart
         const existingCart = CartService.getCartItems();
         setCart(existingCart);
       } catch (error) {
+        // If backend fails, just use dummy data
+        setMenuItems(dummyMenuItems[restaurantId] || []);
         console.error('Error loading menu data:', error);
       } finally {
         setLoading(false);
       }
     };
-
     loadData();
   }, [restaurantId]);
 
