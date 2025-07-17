@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { userService, ProfileResponse } from "@/services";
+import { devLog, devError } from "@/lib/logger";
 
 const Profile = () => {
   const [userData, setUserData] = useState<ProfileResponse | null>(null);
@@ -17,13 +18,16 @@ const Profile = () => {
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);
+      devLog('[Profile] Fetching user profile...');
       try {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Not authenticated');
         const profile = await userService.getProfile(token);
         setUserData(profile);
+        devLog('[Profile] Profile loaded:', profile);
       } catch (err: any) {
         setError(err.message || 'Failed to load profile');
+        devError('[Profile] Failed to fetch profile:', err);
       } finally {
         setLoading(false);
       }

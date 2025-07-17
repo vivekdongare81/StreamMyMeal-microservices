@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { userService, ProfileResponse } from "@/services";
+import { devLog, devError } from "@/lib/logger";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -16,13 +17,16 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       setLoading(true);
       setError(null);
+      devLog('[ProfilePage] Fetching user profile...');
       try {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Not authenticated');
         const profile = await userService.getProfile(token);
         setUserData(profile);
+        devLog('[ProfilePage] Profile loaded:', profile);
       } catch (err: any) {
         setError(err.message || 'Failed to load profile');
+        devError('[ProfilePage] Failed to fetch profile:', err);
       } finally {
         setLoading(false);
       }
@@ -32,14 +36,17 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!userData) return;
+    devLog('[ProfilePage] Attempting to update profile:', userData);
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Not authenticated');
       const updated = await userService.updateProfile(token, userData);
       setUserData(updated);
       setEditMode(false);
+      devLog('[ProfilePage] Profile updated successfully:', updated);
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
+      devError('[ProfilePage] Failed to update profile:', err);
     }
   };
 
@@ -52,7 +59,7 @@ export default function ProfilePage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">My Profile</h1>
         {!editMode && (
-          <Button onClick={() => setEditMode(true)}>Edit Profile</Button>
+          <Button onClick={() => { setEditMode(true); devLog('[ProfilePage] Switched to edit mode'); }}>Edit Profile</Button>
         )}
       </div>
 
@@ -112,7 +119,7 @@ export default function ProfilePage() {
 
             {editMode && (
               <div className="flex justify-end space-x-4 mt-6">
-                <Button variant="outline" onClick={() => setEditMode(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => { setEditMode(false); devLog('[ProfilePage] Cancelled edit mode'); }}>Cancel</Button>
                 <Button onClick={handleSave}>Save Changes</Button>
               </div>
             )}

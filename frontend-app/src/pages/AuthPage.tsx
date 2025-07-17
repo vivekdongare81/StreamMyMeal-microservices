@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { userService } from "@/services";
+import { devLog, devError } from "@/lib/logger";
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,12 +24,16 @@ const AuthPage = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    devLog(`[Auth] Trying to log in as: ${signinEmail}`);
     try {
-      const res = await userService.login({ username: signinEmail, password: signinPassword });
+      const res = await userService.login({ email: signinEmail, password: signinPassword });
       localStorage.setItem('token', res.token);
+      devLog(`[Auth] Login successful! User data:`, res);
       toast.success("Welcome back!");
       navigate('/restaurants');
+      devLog('[Auth] Redirected to /restaurants after login');
     } catch (err: any) {
+      devError(`[Auth] Login failed for ${signinEmail}:`, err);
       toast.error(err.message || "Login failed");
     } finally {
       setIsLoading(false);
@@ -38,12 +43,16 @@ const AuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    devLog(`[Auth] Registering new user:`, { username: signupName, email: signupEmail, address: signupAddress });
     try {
       const res = await userService.register({ username: signupName, email: signupEmail, password: signupPassword, address: signupAddress });
       localStorage.setItem('token', res.token);
+      devLog(`[Auth] Registration successful! User data:`, res);
       toast.success("Account created successfully!");
       navigate('/restaurants');
+      devLog('[Auth] Redirected to /restaurants after signup');
     } catch (err: any) {
+      devError(`[Auth] Registration failed for ${signupEmail}:`, err);
       toast.error(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
@@ -72,10 +81,10 @@ const AuthPage = () => {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Username or Email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="email" type="text" placeholder="your username or email" className="pl-10" required value={signinEmail} onChange={e => setSigninEmail(e.target.value)} />
+                    <Input id="email" type="email" placeholder="your@email.com" className="pl-10" required value={signinEmail} onChange={e => setSigninEmail(e.target.value)} />
                   </div>
                 </div>
                 <div>

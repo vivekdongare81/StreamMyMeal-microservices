@@ -1,5 +1,5 @@
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -29,11 +29,11 @@ export interface ProfileResponse {
 const API_BASE = '/api/v1';
 
 export const userService = {
-  async login({ username, password }: LoginRequest): Promise<AuthResponse> {
+  async login({ email, password }: LoginRequest): Promise<AuthResponse> {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ email, password })
     });
     if (!res.ok) throw new Error('Invalid credentials');
     return res.json();
