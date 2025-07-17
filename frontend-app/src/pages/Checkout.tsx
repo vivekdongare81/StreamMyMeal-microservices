@@ -10,9 +10,11 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { CartService, OrderService, CartItem } from "@/services";
+import { useAuth } from "@/lib/authContext";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [deliveryAddress, setDeliveryAddress] = useState({
     street: "",
@@ -45,30 +47,49 @@ const Checkout = () => {
       toast.error("Please fill in all delivery address fields");
       return;
     }
-
+    if (!user) {
+      toast.error("You must be logged in to place an order");
+      return;
+    }
     setIsProcessing(true);
-    
     try {
+      // Build order payload as per requirements
+      const token = localStorage.getItem('token');
+      // Build orderData dynamically from current profile and cart, matching backend format
       const orderData = {
-        customerInfo: {
-          name: "Customer",
-          email: "customer@example.com",
-          phone: deliveryAddress.phone,
-          address: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.pincode}`
-        },
-        paymentMethod,
-        items: cartItems,
-        total
+        userId: user.userId,
+        recipientName: user.username,
+        contactEmail: user.email,
+        shippingAddress: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.pincode}`,
+        contactPhone: deliveryAddress.phone,
+        items: cartItems.map(item => ({
+          menuItemId: item.id,
+          quantity: item.quantity
+        }))
       };
-
-      const result = await OrderService.placeOrder(orderData);
-      
-      if (result.success) {
-        toast.success(`Order placed successfully! Order ID: ${result.orderId} 🎉`);
-        navigate("/restaurants");
-      } else {
-        toast.error(result.error || "Failed to place order");
-      }
+      // Send order creation request to the correct backend URL
+      const res = await fetch("http://localhost:9000/api/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+      if (!res.ok) throw new Error("Order creation failed");
+      const orderResponse = await res.json();
+      // Send notification with the actual order response (with real orderId)
+      await fetch("/api/v1/notifications/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderResponse)
+      });
+      CartService.clearCart();
+      toast.success(`Order placed successfully! Order ID: ${orderResponse.orderId} 🎉`);
+      navigate("/restaurants");
     } catch (error) {
       toast.error("An error occurred while placing your order");
       console.error('Order placement error:', error);

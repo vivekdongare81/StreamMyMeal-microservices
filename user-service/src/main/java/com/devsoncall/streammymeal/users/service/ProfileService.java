@@ -36,6 +36,7 @@ public class ProfileService {
                 .orElse(null);
 
         return ProfileResponse.builder()
+                .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .address(user.getAddress())
@@ -87,6 +88,7 @@ public class ProfileService {
                 .orElse(null);
 
         return ProfileResponse.builder()
+                .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .address(user.getAddress())

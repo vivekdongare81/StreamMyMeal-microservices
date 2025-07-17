@@ -31,4 +31,12 @@ export class OrderService {
       };
     }
   }
+
+  static async getOrdersByUser(userId: string, page = 0, size = 10) {
+    const res = await fetch(`/api/v1/orders/user/${userId}?page=${page}&size=${size}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    return res.json();
+  }
 }

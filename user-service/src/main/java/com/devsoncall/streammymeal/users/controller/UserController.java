@@ -36,7 +36,9 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponse> getProfile(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(profileService.getProfile(user.getUserId()));
+        ProfileResponse profile = profileService.getProfile(user.getUserId());
+        System.out.println("DEBUG ProfileResponse: " + profile);
+        return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/profile")

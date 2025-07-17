@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { userService } from "@/services";
 import { devLog, devError } from "@/lib/logger";
+import { useAuth } from "@/lib/authContext";
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +21,7 @@ const AuthPage = () => {
   const [signinEmail, setSigninEmail] = useState("admin@streammymeal.com");
   const [signinPassword, setSigninPassword] = useState("admin123");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ const AuthPage = () => {
     devLog(`[Auth] Trying to log in as: ${signinEmail}`);
     try {
       const res = await userService.login({ email: signinEmail, password: signinPassword });
-      localStorage.setItem('token', res.token);
+      await login(res.token); // update context and profile immediately
       devLog(`[Auth] Login successful! User data:`, res);
       toast.success("Welcome back!");
       navigate('/restaurants');
@@ -36,7 +38,7 @@ const AuthPage = () => {
       devError(`[Auth] Login failed for ${signinEmail}:`, err);
       toast.error(err.message || "Login failed");
     } finally {
-      setIsLoading(false);
+    setIsLoading(false);
     }
   };
 
@@ -48,14 +50,44 @@ const AuthPage = () => {
       const res = await userService.register({ username: signupName, email: signupEmail, password: signupPassword, address: signupAddress });
       localStorage.setItem('token', res.token);
       devLog(`[Auth] Registration successful! User data:`, res);
-      toast.success("Account created successfully!");
+    toast.success("Account created successfully!");
       navigate('/restaurants');
       devLog('[Auth] Redirected to /restaurants after signup');
     } catch (err: any) {
       devError(`[Auth] Registration failed for ${signupEmail}:`, err);
       toast.error(err.message || "Registration failed");
     } finally {
-      setIsLoading(false);
+    setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!signinEmail) {
+      toast.error("Please enter your email above first.");
+      return;
+    }
+    // Manual email format check
+    if (!/^[^@]+@[^@]+\.[^@]+$/.test(signinEmail)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:9000/api/v1/auth/forgot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signinEmail })
+      });
+      if (!res.ok) {
+        let errorMsg = "Failed to send password reset email";
+        try {
+          const data = await res.json();
+          errorMsg = data.message || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+      toast.success("Password reset email sent! Check your inbox.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send password reset email");
     }
   };
 
@@ -112,6 +144,9 @@ const AuthPage = () => {
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
+                <Button type="button" variant="link" className="w-full mt-0" onClick={handleForgotPassword}>
+                  Forgot Password?
                 </Button>
               </form>
             </TabsContent>

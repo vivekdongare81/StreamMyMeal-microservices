@@ -143,12 +143,12 @@ const Navbar = () => {
                 </Button>
               </>
             ) : (
-              <Link to="/auth">
-                <Button variant="ghost" size="sm">
-                  <User className="w-4 h-4 mr-2" />
-                  Sign In
-                </Button>
-              </Link>
+            <Link to="/auth">
+              <Button variant="ghost" size="sm">
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            </Link>
             )}
           </div>
 
@@ -231,13 +231,13 @@ const Navbar = () => {
                     </button>
                   </>
                 ) : (
-                  <Link
-                    to="/auth"
-                    className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Sign In
-                  </Link>
+                <Link
+                  to="/auth"
+                  className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
                 )}
               </div>
             </div>

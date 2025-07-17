@@ -69,10 +69,10 @@ public class AuthService {
 
     private void validateNewUserCredentials(RegisterRequest registerRequest) {
         if (userRepository.findByUsernameAndIsActiveTrue(registerRequest.getUsername()).isPresent()) {
-            throw new UserNotFoundException("Username is already taken");
+            throw new AuthException("Username is already taken");
         }
-        if (userRepository.findByUsernameAndIsActiveTrue(registerRequest.getEmail()).isPresent()) {
-            throw new UserNotFoundException("Email is already in use");
+        if (userRepository.findByEmailAndIsActiveTrue(registerRequest.getEmail()).isPresent()) {
+            throw new AuthException("Email is already registered");
         }
     }
 
