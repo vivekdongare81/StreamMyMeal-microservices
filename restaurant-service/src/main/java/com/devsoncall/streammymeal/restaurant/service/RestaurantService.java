@@ -95,4 +95,10 @@ public class RestaurantService {
         return restaurantRepository.searchByKeyword(keyword, pageable)
                 .map(this::toDTO);
     }
+
+    public void deleteRestaurantById(Integer restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
+        restaurantRepository.delete(restaurant);
+    }
 }

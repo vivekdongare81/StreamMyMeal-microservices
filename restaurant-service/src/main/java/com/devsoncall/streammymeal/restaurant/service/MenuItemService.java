@@ -57,7 +57,7 @@ public class MenuItemService {
 
         String oldImageFileName = menuItem.getImageUrl();
 
-        String fileName = imageService.uploadImage(file ,oldImageFileName);
+        String fileName = imageService.uploadMenuImage(file ,oldImageFileName);
 
         menuItem.setImageUrl(fileName);
         menuItemRepository.save(menuItem);

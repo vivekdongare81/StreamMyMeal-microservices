@@ -8,7 +8,7 @@ services:
   microservice-db-config:
     extends:
       service: network-deploy-service
-    image: postgres
+    image: postgres:16.3
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       timeout: 10s

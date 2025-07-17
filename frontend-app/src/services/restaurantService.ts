@@ -22,9 +22,17 @@ export class RestaurantService {
         backendRestaurants = Array.isArray(data) ? data : (data.content || []);
         // Normalize backend IDs to string and image to full URL
         backendRestaurants = backendRestaurants.map(r => ({
-          ...r,
           id: String((r as any).id ?? (r as any).restaurantId),
-          image: getRestaurantImageUrl((r as any).image)
+          name: (r as any).name,
+          address: (r as any).address,
+          image: getRestaurantImageUrl((r as any).image),
+          cuisine: (r as any).cuisine ?? '',
+          rating: (r as any).rating ?? 0,
+          deliveryTime: (r as any).deliveryTime ?? '',
+          location: (r as any).location ?? '',
+          isLive: (r as any).isLive ?? false,
+          viewers: (r as any).viewers ?? 0,
+          priceRange: (r as any).priceRange ?? '',
         }));
       }
     } catch (e) {
@@ -81,6 +89,14 @@ export class RestaurantService {
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to create restaurant');
+    return res.json();
+  }
+
+  static async deleteRestaurant(restaurantId: string) {
+    const res = await fetch(`/api/v1/restaurants/${restaurantId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete restaurant');
     return res.json();
   }
 }

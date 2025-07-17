@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { RestaurantService, Restaurant } from "@/services";
+import { restaurantsData as dummyRestaurants } from '../data/restaurants';
 
 const RestaurantList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,16 +31,23 @@ const RestaurantList = () => {
       try {
         const searchQuery = searchParams.get('search');
         let data;
-        
         if (searchQuery) {
           data = await RestaurantService.searchRestaurants(searchQuery);
           setSearchTerm(searchQuery);
         } else {
           data = await RestaurantService.getRestaurants();
         }
-        
-        setRestaurants(data);
+        // Merge backend and dummy data (append dummy if not present)
+        const merged = [
+          ...data,
+          ...dummyRestaurants.filter(
+            d => !data.some(r => r.name === d.name)
+          )
+        ];
+        setRestaurants(merged);
       } catch (error) {
+        // If backend fails, just use dummy data
+        setRestaurants(dummyRestaurants);
         console.error('Error loading restaurants:', error);
       } finally {
         setLoading(false);
