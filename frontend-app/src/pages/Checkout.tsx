@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { CartService, OrderService, CartItem } from "@/services";
 import { useAuth } from "@/lib/authContext";
 
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_xxxxxxxxxx"; // Replace with your test key or use env
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 function loadScript(src: string) {
   return new Promise((resolve) => {
@@ -81,8 +81,8 @@ const Checkout = () => {
           quantity: item.quantity
         }))
       };
-      // 1. Create order in your order service
-      const res = await fetch("http://localhost:9000/api/v1/orders", {
+      // 1. Always create order first (status PENDING)
+      const res = await fetch("/api/v1/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,10 +109,13 @@ const Checkout = () => {
         return;
       }
 
-      // 2. For online payment, create Razorpay order
+      // 2. For online payment, call payment service with orderId and open Razorpay UI
       const paymentRes = await fetch("/api/payments/create-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           amount: total * 100, // Razorpay expects paise
           currency: "INR",
@@ -122,7 +125,7 @@ const Checkout = () => {
       if (!paymentRes.ok) throw new Error("Failed to create payment order");
       const paymentOrder = await paymentRes.json();
 
-      // 3. Load Razorpay script
+      // Load Razorpay script
       const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
       if (!loaded) {
         toast.error("Failed to load Razorpay SDK");
@@ -130,7 +133,7 @@ const Checkout = () => {
         return;
       }
 
-      // 4. Open Razorpay checkout
+      // Open Razorpay checkout
       const options = {
         key: RAZORPAY_KEY_ID,
         amount: paymentOrder.amount,
@@ -139,8 +142,6 @@ const Checkout = () => {
         description: `Order #${orderResponse.orderId}`,
         order_id: paymentOrder.orderId || paymentOrder.id,
         handler: async function (response: any) {
-          // Optionally: verify payment on backend
-          // await fetch('/api/payments/verify', { ... })
           CartService.clearCart();
           toast.success("Payment successful! Order placed.");
           navigate("/restaurants");
