@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.devsoncall.streammymeal.order.dto.OrderResponse;
 
-@FeignClient(name = "notification-service", url = "http://localhost:8084")
+@FeignClient(name = "notification-service", url = "http://localhost:8085")
 public interface NotificationClient {
     @PostMapping("/api/v1/notifications/order")
     String sendOrderNotification(@RequestBody OrderResponse orderResponse);

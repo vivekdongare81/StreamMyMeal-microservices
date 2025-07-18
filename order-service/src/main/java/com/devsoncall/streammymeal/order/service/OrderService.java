@@ -27,6 +27,8 @@ import com.devsoncall.streammymeal.order.repository.OrderRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -62,13 +64,11 @@ public class OrderService {
                     return orderItem;
                 })
                 .collect(Collectors.toList());
-        logger.info("Order created in 1");
 
         order.setOrderItems(orderItems);
         BigDecimal subtotal = orderItems.stream()
                 .map(OrderItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        logger.info("Order created in 2");
 
         // calculate tax
         BigDecimal tax = subtotal.multiply(Constants.TAX_RATE);
@@ -79,10 +79,11 @@ public class OrderService {
         logger.info("Order created: " + savedOrder);
 
         OrderResponse orderResponse = orderToOrderResponse(savedOrder);
-        // send order notification (optional, non-blocking)
-        sendOrderNotification(orderResponse); // This is best-effort: order creation will succeed even if notification fails
-        logger.info("Notification sent");
-
+        // Only send notification if COD (detect from orderRequest, e.g. orderRequest.getPaymentMethod())
+        if (orderRequest instanceof Map && ((Map)orderRequest).containsKey("paymentMethod") && "cod".equalsIgnoreCase((String)((Map)orderRequest).get("paymentMethod"))) {
+            sendOrderNotification(orderResponse);
+            logger.info("Notification sent for COD order");
+        }
         return orderResponse;
     }
 
@@ -104,8 +105,22 @@ public class OrderService {
     }
 
     public Page<OrderResponse> getOrdersByUser(Integer userId, Pageable pageable) {
-        return orderRepository.findByUserId(userId, pageable)
+        return orderRepository.findByUserIdOrderByOrderDateDesc(userId, pageable)
             .map(this::orderToOrderResponse);
+    }
+
+    public OrderResponse updatePaymentStatus(Integer orderId, String paymentStatus) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        order.setPaymentStatus(Order.PaymentStatus.valueOf(paymentStatus));
+        Order savedOrder = orderRepository.save(order);
+        OrderResponse response = orderToOrderResponse(savedOrder);
+        // Only send notification if payment is PAID
+        if ("PAID".equalsIgnoreCase(paymentStatus)) {
+            sendOrderNotification(response);
+            logger.info("Notification sent for PAID order");
+        }
+        return response;
     }
 
     private OrderResponse orderToOrderResponse(Order order) {

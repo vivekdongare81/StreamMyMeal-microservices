@@ -39,4 +39,12 @@ export class OrderService {
     if (!res.ok) throw new Error('Failed to fetch orders');
     return res.json();
   }
+
+  static async getOrderById(orderId: string | number) {
+    const res = await fetch(`/api/v1/orders/${orderId}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch order details');
+    return res.json();
+  }
 }

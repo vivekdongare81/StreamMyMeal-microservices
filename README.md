@@ -14,7 +14,7 @@ This project adopts a microservices-based architecture, ensuring modularity, fau
 - **User Service** (Port: 8081) : Manages user authentication, profiles, and JWT security.
 - **Restaurant Service** (Port: 8082) : Handles restaurant data, menus, and image uploads.
 - **Order Service** (Port: 8083) : Processes orders, integrates with users/restaurants, and tracks order statuses.
-- **Notification Service** (Port: 8084) : Sends event-driven email notifications using Kafka.
+- **Notification Service** (Port: 8085) : Sends event-driven email notifications using Kafka.
 
 ### Frontend
 - Modern UI built with Angular 17.

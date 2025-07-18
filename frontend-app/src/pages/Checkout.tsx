@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { CartService, OrderService, CartItem } from "@/services";
 import { useAuth } from "@/lib/authContext";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
@@ -40,6 +41,8 @@ const Checkout = () => {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [paidOrder, setPaidOrder] = useState<any>(null);
 
   useEffect(() => {
     const items = CartService.getCartItems();
@@ -117,7 +120,7 @@ const Checkout = () => {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          amount: total * 100, // Razorpay expects paise
+          amount: total * 100, // Convert rupees to paise
           currency: "INR",
           receipt: `order_${orderResponse.orderId}`
         })
@@ -142,9 +145,51 @@ const Checkout = () => {
         description: `Order #${orderResponse.orderId}`,
         order_id: paymentOrder.orderId || paymentOrder.id,
         handler: async function (response: any) {
+          // 1. Mark order as paid in backend
+          let paymentStatus = 'PAID';
+          try {
+            const payRes = await fetch(`/api/v1/orders/${orderResponse.orderId}/pay`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({ paymentId: response.razorpay_payment_id, paymentStatus })
+            });
+            if (payRes.ok) {
+              const order = await payRes.json();
+              setPaidOrder(order);
+              setShowOrderModal(true);
+              setTimeout(() => {
+                setShowOrderModal(false);
+                navigate("/profile");
+              }, 2000);
+            }
+          } catch (err) {
+            // If payment fails, mark as FAILED
+            paymentStatus = 'FAILED';
+            try {
+              const failRes = await fetch(`/api/v1/orders/${orderResponse.orderId}/pay`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ paymentStatus })
+              });
+              if (failRes.ok) {
+                const order = await failRes.json();
+                setPaidOrder(order);
+                setShowOrderModal(true);
+              }
+            } catch (failErr) {
+              console.error('Failed to update order as failed:', failErr);
+            }
+            toast.error("Payment failed. Please try again.");
+            return;
+          }
           CartService.clearCart();
           toast.success("Payment successful! Order placed.");
-          navigate("/restaurants");
         },
         prefill: {
           name: user.username,
@@ -377,6 +422,34 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      <Dialog open={showOrderModal} onOpenChange={setShowOrderModal}>
+        <DialogContent>
+          <DialogTitle>Order Placed Successfully!</DialogTitle>
+          {paidOrder && (
+            <div className="space-y-2">
+              <div><b>Order ID:</b> {paidOrder.orderId}</div>
+              <div><b>Amount:</b> ₹{paidOrder.totalAmount}</div>
+              <div><b>Status:</b> {paidOrder.status}</div>
+              <div><b>Payment Status:</b> {paidOrder.paymentStatus}</div>
+              <div><b>Date:</b> {paidOrder.orderDate ? new Date(paidOrder.orderDate).toLocaleString() : ''}</div>
+              <div><b>Recipient:</b> {paidOrder.recipientName}</div>
+              <div><b>Shipping Address:</b> {paidOrder.shippingAddress}</div>
+              <div><b>Items:</b>
+                <ul className="list-disc ml-6">
+                  {paidOrder.items && paidOrder.items.map((item: any) => (
+                    <li key={item.orderItemId}>
+                      Menu Item ID: {item.menuItemId}, Quantity: {item.quantity}, Subtotal: ₹{item.subtotal}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Button className="w-full mt-4" onClick={() => { setShowOrderModal(false); navigate("/profile"); }}>
+                Go to My Orders
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

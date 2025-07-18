@@ -77,6 +77,18 @@ export const userService = {
     if (!res.ok) throw new Error('Failed to update profile');
     return res.json();
   },
+  async updateProfileById(userId: number, token: string, profile: Partial<ProfileResponse>): Promise<ProfileResponse> {
+    const res = await fetch(`/api/v1/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profile)
+    });
+    if (!res.ok) throw new Error('Failed to update profile by userId');
+    return res.json();
+  },
   logout() {
     localStorage.removeItem('token');
   },

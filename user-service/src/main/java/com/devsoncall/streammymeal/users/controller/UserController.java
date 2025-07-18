@@ -105,11 +105,37 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<UserDTO> updateUser(
+    public ResponseEntity<?> updateUser(
             @PathVariable Integer id,
-            @Valid @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(id, userDTO));
+            @Valid @RequestBody UserDTO userDTO,
+            @AuthenticationPrincipal User authUser) {
+        try {
+            // If admin, allow full update
+            if (authUser.getRoles().contains("ROLE_ADMIN")) {
+                return ResponseEntity.ok(userService.updateUser(id, userDTO));
+            }
+            // If not admin, only allow updating own address
+            if (!authUser.getUserId().equals(id)) {
+                return ResponseEntity.status(403).body("You can only update your own profile");
+            }
+            // Only update address
+            UserDTO existing = userService.getUserById(id);
+            existing.setAddress(userDTO.getAddress());
+            UserDTO updated = userService.updateUser(id, existing);
+            // Optionally, return ProfileResponse for consistency
+            ProfileResponse profile = ProfileResponse.builder()
+                .userId(updated.getUserId())
+                .username(updated.getUsername())
+                .email(updated.getEmail())
+                .address(updated.getAddress())
+                .profileImageUrl(null) // set if needed
+                .build();
+            return ResponseEntity.ok(profile);
+        } catch (Exception e) {
+            // Log the error
+            e.printStackTrace();
+            return ResponseEntity.status(400).body("Failed to update user: " + e.getMessage());
+        }
     }
 
     @PostMapping("/{id}/deactivate")

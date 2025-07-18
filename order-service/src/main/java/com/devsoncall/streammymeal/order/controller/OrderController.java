@@ -19,6 +19,8 @@ import com.devsoncall.streammymeal.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/orders")
@@ -56,5 +58,12 @@ public class OrderController {
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderResponse> orders = orderService.getOrdersByUser(userId, pageable);
         return ResponseEntity.ok(orders);
+    }
+
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<OrderResponse> updatePaymentStatus(@PathVariable Integer orderId, @RequestBody Map<String, String> body) {
+        String paymentStatus = body.getOrDefault("paymentStatus", "PAID");
+        OrderResponse updatedOrder = orderService.updatePaymentStatus(orderId, paymentStatus);
+        return ResponseEntity.ok(updatedOrder);
     }
 }
