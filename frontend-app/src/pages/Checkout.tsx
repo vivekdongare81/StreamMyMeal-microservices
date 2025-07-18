@@ -43,6 +43,7 @@ const Checkout = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [paidOrder, setPaidOrder] = useState<any>(null);
+  const [showTestCardModal, setShowTestCardModal] = useState(false);
 
   useEffect(() => {
     const items = CartService.getCartItems();
@@ -68,6 +69,10 @@ const Checkout = () => {
     }
     if (!user) {
       toast.error("You must be logged in to place an order");
+      return;
+    }
+    if (paymentMethod === "card") {
+      setShowTestCardModal(true);
       return;
     }
     setIsProcessing(true);
@@ -111,6 +116,135 @@ const Checkout = () => {
         navigate("/restaurants");
         return;
       }
+
+      // 2. For online payment, call payment service with orderId and open Razorpay UI
+      const paymentRes = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          amount: total * 100, // Convert rupees to paise
+          currency: "INR",
+          receipt: `order_${orderResponse.orderId}`
+        })
+      });
+      if (!paymentRes.ok) throw new Error("Failed to create payment order");
+      const paymentOrder = await paymentRes.json();
+
+      // Load Razorpay script
+      const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!loaded) {
+        toast.error("Failed to load Razorpay SDK");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Open Razorpay checkout
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: paymentOrder.amount,
+        currency: paymentOrder.currency,
+        name: "StreamMyMeal",
+        description: `Order #${orderResponse.orderId}`,
+        order_id: paymentOrder.orderId || paymentOrder.id,
+        handler: async function (response: any) {
+          // 1. Mark order as paid in backend
+          let paymentStatus = 'PAID';
+          try {
+            const payRes = await fetch(`/api/v1/orders/${orderResponse.orderId}/pay`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({ paymentId: response.razorpay_payment_id, paymentStatus })
+            });
+            if (payRes.ok) {
+              const order = await payRes.json();
+              setPaidOrder(order);
+              setShowOrderModal(true);
+              setTimeout(() => {
+                setShowOrderModal(false);
+                navigate("/profile");
+              }, 2000);
+            }
+          } catch (err) {
+            // If payment fails, mark as FAILED
+            paymentStatus = 'FAILED';
+            try {
+              const failRes = await fetch(`/api/v1/orders/${orderResponse.orderId}/pay`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ paymentStatus })
+              });
+              if (failRes.ok) {
+                const order = await failRes.json();
+                setPaidOrder(order);
+                setShowOrderModal(true);
+              }
+            } catch (failErr) {
+              console.error('Failed to update order as failed:', failErr);
+            }
+            toast.error("Payment failed. Please try again.");
+            return;
+          }
+          CartService.clearCart();
+          toast.success("Payment successful! Order placed.");
+        },
+        prefill: {
+          name: user.username,
+          email: user.email,
+          contact: deliveryAddress.phone
+        },
+        notes: {
+          address: orderData.shippingAddress
+        },
+        theme: { color: "#3399cc" }
+      };
+      // @ts-ignore
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      toast.error("An error occurred while placing your order");
+      console.error('Order placement error:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // This function will be called after user sees test card modal
+  const handleContinueToPayment = async () => {
+    setShowTestCardModal(false);
+    setIsProcessing(true);
+    try {
+      const token = localStorage.getItem('token');
+      const orderData = {
+        userId: user.userId,
+        recipientName: user.username,
+        contactEmail: user.email,
+        shippingAddress: `${deliveryAddress.street}, ${deliveryAddress.city}, ${deliveryAddress.pincode}`,
+        contactPhone: deliveryAddress.phone,
+        items: cartItems.map(item => ({
+          menuItemId: item.id,
+          quantity: item.quantity
+        }))
+      };
+      // 1. Always create order first (status PENDING)
+      const res = await fetch("/api/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+      if (!res.ok) throw new Error("Order creation failed");
+      const orderResponse = await res.json();
 
       // 2. For online payment, call payment service with orderId and open Razorpay UI
       const paymentRes = await fetch("/api/payments/create-order", {
@@ -306,25 +440,6 @@ const Checkout = () => {
                     <Label htmlFor="cod" className="cursor-pointer">Cash on Delivery</Label>
                   </div>
                 </RadioGroup>
-
-                {paymentMethod === "card" && (
-                  <div className="mt-4 space-y-4">
-                    <div>
-                      <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="expiry">Expiry Date</Label>
-                        <Input id="expiry" placeholder="MM/YY" />
-                      </div>
-                      <div>
-                        <Label htmlFor="cvv">CVV</Label>
-                        <Input id="cvv" placeholder="123" />
-                      </div>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -450,6 +565,23 @@ const Checkout = () => {
           )}
         </DialogContent>
       </Dialog>
+      {/* Test Card Modal */}
+      {showTestCardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-8 max-w-sm w-full shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Test Card Details</h2>
+            <div className="mb-4">
+              <b>Card Number:</b> 5267 3181 8797 5449<br />
+              <b>CVV:</b> Any 3 digits<br />
+              <b>Expiry:</b> Any future date<br />
+              <b>Name:</b> Any name
+            </div>
+            <Button className="w-full" onClick={handleContinueToPayment}>
+              Continue to Payment
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
