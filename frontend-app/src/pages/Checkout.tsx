@@ -12,6 +12,22 @@ import { toast } from "sonner";
 import { CartService, OrderService, CartItem } from "@/services";
 import { useAuth } from "@/lib/authContext";
 
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_xxxxxxxxxx"; // Replace with your test key or use env
+
+function loadScript(src: string) {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+}
+
 const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -53,9 +69,7 @@ const Checkout = () => {
     }
     setIsProcessing(true);
     try {
-      // Build order payload as per requirements
       const token = localStorage.getItem('token');
-      // Build orderData dynamically from current profile and cart, matching backend format
       const orderData = {
         userId: user.userId,
         recipientName: user.username,
@@ -67,7 +81,7 @@ const Checkout = () => {
           quantity: item.quantity
         }))
       };
-      // Send order creation request to the correct backend URL
+      // 1. Create order in your order service
       const res = await fetch("http://localhost:9000/api/v1/orders", {
         method: "POST",
         headers: {
@@ -78,18 +92,72 @@ const Checkout = () => {
       });
       if (!res.ok) throw new Error("Order creation failed");
       const orderResponse = await res.json();
-      // Send notification with the actual order response (with real orderId)
-      await fetch("/api/v1/notifications/order", {
+
+      if (paymentMethod === "cod") {
+        // COD: finish order, send notification, clear cart
+        await fetch("/api/v1/notifications/order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(orderResponse)
+        });
+        CartService.clearCart();
+        toast.success(`Order placed successfully! Order ID: ${orderResponse.orderId} 🎉`);
+        navigate("/restaurants");
+        return;
+      }
+
+      // 2. For online payment, create Razorpay order
+      const paymentRes = await fetch("/api/payments/create-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(orderResponse)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total * 100, // Razorpay expects paise
+          currency: "INR",
+          receipt: `order_${orderResponse.orderId}`
+        })
       });
-      CartService.clearCart();
-      toast.success(`Order placed successfully! Order ID: ${orderResponse.orderId} 🎉`);
-      navigate("/restaurants");
+      if (!paymentRes.ok) throw new Error("Failed to create payment order");
+      const paymentOrder = await paymentRes.json();
+
+      // 3. Load Razorpay script
+      const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!loaded) {
+        toast.error("Failed to load Razorpay SDK");
+        setIsProcessing(false);
+        return;
+      }
+
+      // 4. Open Razorpay checkout
+      const options = {
+        key: RAZORPAY_KEY_ID,
+        amount: paymentOrder.amount,
+        currency: paymentOrder.currency,
+        name: "StreamMyMeal",
+        description: `Order #${orderResponse.orderId}`,
+        order_id: paymentOrder.orderId || paymentOrder.id,
+        handler: async function (response: any) {
+          // Optionally: verify payment on backend
+          // await fetch('/api/payments/verify', { ... })
+          CartService.clearCart();
+          toast.success("Payment successful! Order placed.");
+          navigate("/restaurants");
+        },
+        prefill: {
+          name: user.username,
+          email: user.email,
+          contact: deliveryAddress.phone
+        },
+        notes: {
+          address: orderData.shippingAddress
+        },
+        theme: { color: "#3399cc" }
+      };
+      // @ts-ignore
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
       toast.error("An error occurred while placing your order");
       console.error('Order placement error:', error);

@@ -117,20 +117,20 @@ const Profile = () => {
                   ) : (
                     orders.map((order) => (
                       <div key={order.orderId} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
+                      <div>
                           <h3 className="font-medium">{order.restaurantName || order.recipientName}</h3>
                           <p className="text-sm text-muted-foreground">
                             {order.items && order.items.map((i: any) => i.name || i.menuItemId).join(', ')}
                           </p>
                           <p className="text-xs text-muted-foreground">{order.orderDate ? new Date(order.orderDate).toLocaleString() : ''}</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">₹{order.totalAmount}</div>
-                          <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            {order.status}
-                          </Badge>
-                        </div>
                       </div>
+                      <div className="text-right">
+                          <div className="font-medium">₹{order.totalAmount}</div>
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          {order.status}
+                        </Badge>
+                      </div>
+                    </div>
                     ))
                   )}
                 </div>

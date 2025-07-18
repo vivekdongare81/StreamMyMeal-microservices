@@ -16,6 +16,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/menu-items/**").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/restaurants/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             );

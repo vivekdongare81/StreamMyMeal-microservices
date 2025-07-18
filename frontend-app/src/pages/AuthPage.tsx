@@ -31,7 +31,7 @@ const AuthPage = () => {
       const res = await userService.login({ email: signinEmail, password: signinPassword });
       await login(res.token); // update context and profile immediately
       devLog(`[Auth] Login successful! User data:`, res);
-      toast.success("Welcome back!");
+    toast.success("Welcome back!");
       navigate('/restaurants');
       devLog('[Auth] Redirected to /restaurants after login');
     } catch (err: any) {
@@ -51,8 +51,8 @@ const AuthPage = () => {
       localStorage.setItem('token', res.token);
       devLog(`[Auth] Registration successful! User data:`, res);
     toast.success("Account created successfully!");
-      navigate('/restaurants');
-      devLog('[Auth] Redirected to /restaurants after signup');
+      navigate('/');
+      devLog('[Auth] Redirected to / after signup');
     } catch (err: any) {
       devError(`[Auth] Registration failed for ${signupEmail}:`, err);
       toast.error(err.message || "Registration failed");
