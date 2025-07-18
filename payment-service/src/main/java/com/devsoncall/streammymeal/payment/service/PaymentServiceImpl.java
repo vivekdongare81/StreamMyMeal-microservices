@@ -26,7 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
     public String createRazorpayOrder(int amount, String currency, String receipt) {
         try {
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", amount * 100); // Razorpay expects amount in paise
+            orderRequest.put("amount", amount); // Razorpay expects amount in paise
             orderRequest.put("currency", currency);
             orderRequest.put("receipt", receipt);
             orderRequest.put("payment_capture", 1);

@@ -8,4 +8,5 @@ import com.devsoncall.streammymeal.order.entity.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Integer> {
     Page<Order> findByUserId(Integer userId, Pageable pageable);
+    Page<Order> findByUserIdOrderByOrderDateDesc(Integer userId, Pageable pageable);
 }

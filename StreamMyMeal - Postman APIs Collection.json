@@ -1421,12 +1421,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8084/api/v1/notifications/welcome-email",
+							"raw": "http://localhost:8085/api/v1/notifications/welcome-email",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8084",
+							"port": "8085",
 							"path": [
 								"api",
 								"v1",
@@ -1465,12 +1465,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8084/api/v1/notifications/order",
+							"raw": "http://localhost:8085/api/v1/notifications/order",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8084",
+							"port": "8085",
 							"path": [
 								"api",
 								"v1",
@@ -1509,12 +1509,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8084/api/v1/notifications/reset-password-email",
+							"raw": "http://localhost:8085/api/v1/notifications/reset-password-email",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8084",
+							"port": "8085",
 							"path": [
 								"api",
 								"v1",

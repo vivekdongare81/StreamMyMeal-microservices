@@ -7,7 +7,7 @@ INSERT INTO restaurants (name, address, image) VALUES
   ('Thai Delight', 'Beach Road', 'thai-delight.jpg'),
   ('Pizza Palace', 'College Street', 'pizza-palace.jpg'),
   ('Chinese Palace', 'College Street', 'pizza-palace.jpg'),
-  ('Chinese Palace', 'College Street', 'pizza-palace.jpg'),
+  ('Chinese Palace', 'College Street', 'cafe-coffee,jpg'),
   ('Tandoori Treats', 'Market Square', 'tandoori-treats.jpg'),
   ('Delicious South', 'Old Town', 'delicious-south.jpg');
 
