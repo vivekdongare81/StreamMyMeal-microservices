@@ -22,4 +22,19 @@ CREATE TABLE IF NOT EXISTS password_reset_token (
     user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     expiry_date TIMESTAMP NOT NULL,
     used BOOLEAN NOT NULL DEFAULT FALSE
-); 
+);
+
+-- Seed admin user (V2)
+INSERT INTO users (username, email, password, is_active)
+SELECT 'Admin', 'admin@streammymeal.com', '$2a$10$Dow1Qw1Qw1Qw1Qw1Qw1QwOeQw1Qw1Qw1Qw1Qw1Qw1Qw1Qw1Qw1', TRUE
+WHERE NOT EXISTS (
+  SELECT 1 FROM users WHERE email = 'admin@streammymeal.com'
+);
+
+INSERT INTO user_roles (user_id, role)
+SELECT user_id, 'ROLE_ADMIN' FROM users WHERE email = 'admin@streammymeal.com'
+  AND NOT EXISTS (
+    SELECT 1 FROM user_roles ur
+    JOIN users u ON ur.user_id = u.user_id
+    WHERE u.email = 'admin@streammymeal.com' AND ur.role = 'ROLE_ADMIN'
+  ); 

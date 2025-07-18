@@ -136,11 +136,11 @@ export default function ProfilePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="border rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium">
                       {userData.address || 'No address on file'}
-                    </h3>
+                      </h3>
                   </div>
                 </div>
               </div>

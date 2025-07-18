@@ -78,9 +78,9 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
         logger.info("Order created: " + savedOrder);
 
-        // send order notification
         OrderResponse orderResponse = orderToOrderResponse(savedOrder);
-        sendOrderNotification(orderResponse);
+        // send order notification (optional, non-blocking)
+        sendOrderNotification(orderResponse); // This is best-effort: order creation will succeed even if notification fails
         logger.info("Notification sent");
 
         return orderResponse;
