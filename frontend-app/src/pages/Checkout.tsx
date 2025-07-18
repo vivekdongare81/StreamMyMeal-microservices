@@ -428,12 +428,8 @@ const Checkout = () => {
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">
                       <CreditCard className="w-4 h-4" />
-                      Credit/Debit Card
+                      Pay Now
                     </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="upi" id="upi" />
-                    <Label htmlFor="upi" className="cursor-pointer">UPI Payment</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="cod" id="cod" />
