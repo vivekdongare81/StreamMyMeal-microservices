@@ -6,74 +6,70 @@ const room = 'restaurant-1'; // Use dynamic restaurant ID as needed
 
 export default function Broadcaster() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(null);
+  // Map of viewerId -> RTCPeerConnection
+  const peerConnections = useRef<{ [viewerId: string]: RTCPeerConnection }>({});
   const stompClientRef = useRef<Client | null>(null);
-  const iceCandidateQueue = useRef<any[]>([]);
-  const remoteDescriptionSet = useRef(false);
+  const localStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
-    // 1. Connect to Spring Boot WebSocket
     const socket = new SockJS('http://localhost:8086/ws');
     const stompClient = new Client({ webSocketFactory: () => socket });
     stompClientRef.current = stompClient;
 
     stompClient.onConnect = () => {
-      // 2. Subscribe to signaling topic for this room
       stompClient.subscribe(`/topic/${room}`, async (msg) => {
         const data = JSON.parse(msg.body);
+        const viewerId = data.from;
+        if (!viewerId) return;
+
+        if (data.type === 'join') {
+          // New viewer joined, create a new connection for them
+          if (!peerConnections.current[viewerId]) {
+            const pc = new RTCPeerConnection();
+            peerConnections.current[viewerId] = pc;
+            // Add tracks
+            localStreamRef.current?.getTracks().forEach(track => {
+              pc.addTrack(track, localStreamRef.current!);
+            });
+            // ICE
+            pc.onicecandidate = e => {
+              if (e.candidate) {
+                stompClient.publish({
+                  destination: '/app/signal',
+                  body: JSON.stringify({ type: 'candidate', room, to: viewerId, data: e.candidate })
+                });
+              }
+            };
+            pc.oniceconnectionstatechange = () => {
+              console.log(`ICE state for ${viewerId}:`, pc.iceConnectionState);
+            };
+            // Offer
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            stompClient.publish({
+              destination: '/app/signal',
+              body: JSON.stringify({ type: 'offer', room, to: viewerId, data: offer })
+            });
+          }
+        }
         if (data.type === 'answer') {
-          await pcRef.current?.setRemoteDescription(new RTCSessionDescription(data.data));
-          remoteDescriptionSet.current = true;
-          // Add any queued candidates
-          while (iceCandidateQueue.current.length > 0) {
-            const candidate = iceCandidateQueue.current.shift();
-            await pcRef.current?.addIceCandidate(new RTCIceCandidate(candidate));
+          const pc = peerConnections.current[viewerId];
+          if (pc) {
+            await pc.setRemoteDescription(new RTCSessionDescription(data.data));
           }
         }
         if (data.type === 'candidate') {
-          if (remoteDescriptionSet.current) {
-            await pcRef.current?.addIceCandidate(new RTCIceCandidate(data.data));
-          } else {
-            iceCandidateQueue.current.push(data.data);
+          const pc = peerConnections.current[viewerId];
+          if (pc) {
+            await pc.addIceCandidate(new RTCIceCandidate(data.data));
           }
         }
       });
 
-      // 3. Start camera/mic and WebRTC
+      // Start camera/mic and store stream
       navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
         if (videoRef.current) videoRef.current.srcObject = stream;
-        pcRef.current = new RTCPeerConnection();
-
-        // Debug: log when tracks are added
-        stream.getTracks().forEach(track => {
-          console.log('Adding track to peer connection:', track.kind);
-          pcRef.current!.addTrack(track, stream);
-        });
-
-        pcRef.current.onicecandidate = e => {
-          if (e.candidate) {
-            stompClient.publish({
-              destination: '/app/signal',
-              body: JSON.stringify({ type: 'candidate', room, data: e.candidate })
-            });
-          }
-        };
-
-        pcRef.current.oniceconnectionstatechange = () => {
-          console.log('Broadcaster ICE state:', pcRef.current.iceConnectionState);
-        };
-
-        pcRef.current.onnegotiationneeded = () => {
-          console.log('Negotiation needed');
-        };
-
-        pcRef.current.createOffer().then(offer => {
-          pcRef.current!.setLocalDescription(offer);
-          stompClient.publish({
-            destination: '/app/signal',
-            body: JSON.stringify({ type: 'offer', room, data: offer })
-          });
-        });
+        localStreamRef.current = stream;
       });
     };
 
@@ -81,6 +77,8 @@ export default function Broadcaster() {
 
     return () => {
       stompClient.deactivate();
+      // Close all peer connections
+      Object.values(peerConnections.current).forEach(pc => pc.close());
     };
   }, []);
 

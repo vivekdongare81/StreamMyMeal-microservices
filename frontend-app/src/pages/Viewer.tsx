@@ -4,12 +4,18 @@ import { Client } from '@stomp/stompjs';
 
 const room = 'restaurant-1'; // Use dynamic restaurant ID as needed
 
+// Helper to generate a unique ID for each viewer
+function generateId() {
+  return 'viewer-' + Math.random().toString(36).substr(2, 9);
+}
+
 export default function Viewer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const stompClientRef = useRef<Client | null>(null);
   const iceCandidateQueue = useRef<any[]>([]);
   const remoteDescriptionSet = useRef(false);
+  const viewerId = useRef(generateId());
 
   useEffect(() => {
     const socket = new SockJS('http://localhost:8086/ws');
@@ -19,6 +25,8 @@ export default function Viewer() {
     stompClient.onConnect = () => {
       stompClient.subscribe(`/topic/${room}`, async (msg) => {
         const data = JSON.parse(msg.body);
+        // Only handle messages intended for this viewer or broadcast
+        if (data.to && data.to !== viewerId.current) return;
         if (data.type === 'offer') {
           await pcRef.current?.setRemoteDescription(new RTCSessionDescription(data.data));
           remoteDescriptionSet.current = true;
@@ -26,7 +34,7 @@ export default function Viewer() {
           await pcRef.current!.setLocalDescription(answer);
           stompClient.publish({
             destination: '/app/signal',
-            body: JSON.stringify({ type: 'answer', room, data: answer })
+            body: JSON.stringify({ type: 'answer', room, from: viewerId.current, data: answer })
           });
           // Add any queued candidates
           while (iceCandidateQueue.current.length > 0) {
@@ -53,12 +61,19 @@ export default function Viewer() {
       pcRef.current.oniceconnectionstatechange = () => {
         console.log('Viewer ICE state:', pcRef.current.iceConnectionState);
       };
+
+      // Send join message to broadcaster
+      stompClient.publish({
+        destination: '/app/signal',
+        body: JSON.stringify({ type: 'join', room, from: viewerId.current })
+      });
     };
 
     stompClient.activate();
 
     return () => {
       stompClient.deactivate();
+      pcRef.current?.close();
     };
   }, []);
 
