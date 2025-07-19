@@ -1,4 +1,49 @@
 
+Here's how the frontend app creates broadcasts and viewers for live streaming, specifically for the /broadcaster and /viewer routes:
+1. Frontend Routing and Entry Points
+The frontend uses React Router to map /broadcaster to the Broadcaster component and /viewer to the Viewer component (frontend-app/src/App.tsx).
+There are also links/buttons in the UI (e.g., on the home page) that direct users to these routes.
+
+2. Broadcast Creation (/broadcaster)
+File: frontend-app/src/pages/Broadcaster.tsx
+How it works:
+When a user visits /broadcaster, the app:
+Connects to the SFU (Selective Forwarding Unit) server via Socket.IO (http://localhost:4000).
+Requests RTP capabilities from the SFU.
+Loads the Mediasoup device with these capabilities.
+Requests access to the user's camera and microphone.
+Creates a WebRTC send transport via the SFU.
+Produces (publishes) the user's video and audio tracks to the SFU.
+Sets the local video preview.
+Listens for new viewers joining (via the new-consumer event).
+Result: The broadcaster's media is sent to the SFU, making it available for viewers.
+3. Viewer Creation (/viewer)
+File: frontend-app/src/pages/Viewer.tsx
+How it works:
+When a user visits /viewer, the app:
+Connects to the SFU via Socket.IO.
+Requests RTP capabilities and loads the Mediasoup device.
+Creates a WebRTC receive transport.
+Listens for new-producer events (i.e., when a broadcaster is live).
+When a producer (broadcaster) is available, it requests to consume the video.
+Receives the video track and attaches it to the video element for playback.
+Result: The viewer receives and watches the live stream from the broadcaster.
+
+4. How the Flow is Triggered
+Navigation: Users can click "Go Live (Broadcaster)" or "Watch Live (Viewer)" on the home page (frontend-app/src/pages/Index.tsx), which navigates to the respective routes.
+Live Streaming Page: There is also a /live/:restaurantId route for watching specific restaurant streams, but /broadcaster and /viewer are the generic entry points for starting and watching a broadcast.
+5. Backend/Signaling
+The actual signaling and media routing is handled by the SFU server (live-sfu-server/server.js), which manages transports, producers, and consumers for each peer (broadcaster/viewer).
+The backend service (live-streaming-service) can also start/stop sessions and interact with the SFU, but the direct media flow is between the frontend and the SFU.
+Summary Table
+| Route | Component | What it does |
+|-------------------|------------------|------------------------------------------------------------------------------|
+| /broadcaster | Broadcaster.tsx| Publishes local video/audio to SFU, starts a broadcast |
+| /viewer | Viewer.tsx | Connects to SFU, consumes and plays broadcast media from a broadcaster |
+| /live/:id | LiveStreaming | (For restaurant-specific streams, may use mock data or similar logic) |
+If you want to see the exact code for how the broadcast and viewer logic works, let me know which part you want to dive deeper into (e.g., the socket events, Mediasoup usage, or UI flow)!
+
+-----------------------------------------------------------------------------------
 Excellent question! Here’s a clear, honest answer:
 
 ---
