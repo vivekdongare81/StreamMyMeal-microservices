@@ -1,86 +1,125 @@
-import React, { useRef, useEffect } from 'react';
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
+import React, { useRef, useEffect, useState } from 'react';
+import io from 'socket.io-client';
+import * as mediasoupClient from 'mediasoup-client';
 
-const room = 'restaurant-1'; // Use dynamic restaurant ID as needed
+const SFU_URL = 'http://localhost:4000';
 
 export default function Broadcaster() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  // Map of viewerId -> RTCPeerConnection
-  const peerConnections = useRef<{ [viewerId: string]: RTCPeerConnection }>({});
-  const stompClientRef = useRef<Client | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const socket = new SockJS('http://localhost:8086/ws');
-    const stompClient = new Client({ webSocketFactory: () => socket });
-    stompClientRef.current = stompClient;
+    let socket: ReturnType<typeof io>;
+    let device: mediasoupClient.types.Device;
+    let sendTransport: mediasoupClient.types.Transport;
+    let localStream: MediaStream;
 
-    stompClient.onConnect = () => {
-      stompClient.subscribe(`/topic/${room}`, async (msg) => {
-        const data = JSON.parse(msg.body);
-        const viewerId = data.from;
-        if (!viewerId) return;
+    async function start() {
+      try {
+        setStatus('Connecting to SFU...');
+        setError(null);
+        console.log('[Broadcaster] Connecting to SFU...');
+        socket = io(SFU_URL);
 
-        if (data.type === 'join') {
-          // New viewer joined, create a new connection for them
-          if (!peerConnections.current[viewerId]) {
-            const pc = new RTCPeerConnection();
-            peerConnections.current[viewerId] = pc;
-            // Add tracks
-            localStreamRef.current?.getTracks().forEach(track => {
-              pc.addTrack(track, localStreamRef.current!);
-            });
-            // ICE
-            pc.onicecandidate = e => {
-              if (e.candidate) {
-                stompClient.publish({
-                  destination: '/app/signal',
-                  body: JSON.stringify({ type: 'candidate', room, to: viewerId, data: e.candidate })
+        socket.on('connect', async () => {
+          try {
+            setStatus('Connected to SFU.');
+            console.log('[Broadcaster] Connected to SFU.');
+            // 1. Get RTP Capabilities
+            socket.emit('get-rtp-capabilities', null, async (rtpCapabilities: any) => {
+              try {
+                device = new mediasoupClient.Device();
+                await device.load({ routerRtpCapabilities: rtpCapabilities });
+
+                // 2. Get user media
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                console.log('[Broadcaster] Got user media:', localStream);
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                  console.log('[Broadcaster] Video track settings:', videoTrack.getSettings());
+                  videoTrack.onended = () => console.log('[Broadcaster] Video track ended');
+                  videoTrack.onmute = () => console.log('[Broadcaster] Video track muted');
+                  videoTrack.onunmute = () => console.log('[Broadcaster] Video track unmuted');
+                }
+                if (videoRef.current) videoRef.current.srcObject = localStream;
+                console.log('[Broadcaster] Got user media, creating send transport...');
+
+                // 3. Create send transport
+                socket.emit('create-transport', null, async (params: any) => {
+                  try {
+                    sendTransport = device.createSendTransport(params);
+
+                    sendTransport.on('connect', ({ dtlsParameters }, callback, errback) => {
+                      try {
+                        console.log('[Broadcaster] Connecting send transport...');
+                        socket.emit('connect-transport', { transportId: sendTransport.id, dtlsParameters }, callback);
+                      } catch (err) {
+                        setError('Send transport connect error: ' + err);
+                        errback(err);
+                      }
+                    });
+
+                    sendTransport.on('produce', ({ kind, rtpParameters }, callback, errback) => {
+                      try {
+                        console.log(`[Broadcaster] Producing ${kind}...`);
+                        socket.emit('produce', { transportId: sendTransport.id, kind, rtpParameters }, ({ id }: any) => callback({ id }));
+                      } catch (err) {
+                        setError('Produce error: ' + err);
+                        errback(err);
+                      }
+                    });
+
+                    // 4. Produce video and audio
+                    for (const track of localStream.getTracks()) {
+                      try {
+                        const producer = await sendTransport.produce({ track });
+                        console.log(`[Broadcaster] Track produced: ${track.kind}, id: ${track.id}, producer id: ${producer.id}`);
+
+                      } catch (err) {
+                        setError('Track produce error: ' + err);
+                      }
+                    }
+                    setStatus('Broadcasting live!');
+                    console.log('[Broadcaster] Broadcasting live!');
+                  } catch (err) {
+                    setError('Create send transport error: ' + err);
+                  }
                 });
+              } catch (err) {
+                setError('Device or user media error: ' + err);
               }
-            };
-            pc.oniceconnectionstatechange = () => {
-              console.log(`ICE state for ${viewerId}:`, pc.iceConnectionState);
-            };
-            // Offer
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            stompClient.publish({
-              destination: '/app/signal',
-              body: JSON.stringify({ type: 'offer', room, to: viewerId, data: offer })
             });
+          } catch (err) {
+            setError('RTP Capabilities error: ' + err);
           }
-        }
-        if (data.type === 'answer') {
-          const pc = peerConnections.current[viewerId];
-          if (pc) {
-            await pc.setRemoteDescription(new RTCSessionDescription(data.data));
-          }
-        }
-        if (data.type === 'candidate') {
-          const pc = peerConnections.current[viewerId];
-          if (pc) {
-            await pc.addIceCandidate(new RTCIceCandidate(data.data));
-          }
-        }
-      });
+        });
 
-      // Start camera/mic and store stream
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-        if (videoRef.current) videoRef.current.srcObject = stream;
-        localStreamRef.current = stream;
-      });
-    };
+        // Listen for new consumers (viewers)
+        socket.on('new-consumer', (data) => {
+          console.log(`[Broadcaster] New viewer joined: consumer ${data.consumerId} for peer ${data.peerId}`);
+        });
 
-    stompClient.activate();
-
+        socket.on('connect_error', (err) => {
+          setError('Socket.io connect error: ' + err);
+        });
+      } catch (err) {
+        setError('SFU connection error: ' + err);
+      }
+    }
+    start();
     return () => {
-      stompClient.deactivate();
-      // Close all peer connections
-      Object.values(peerConnections.current).forEach(pc => pc.close());
+      setStatus('');
+      if (socket) socket.disconnect();
+      if (localStream) localStream.getTracks().forEach(t => t.stop());
     };
   }, []);
 
-  return <video ref={videoRef} autoPlay muted style={{ width: 400 }} />;
+  return (
+    <div>
+      <video ref={videoRef} autoPlay muted style={{ width: 400 }} />
+      <div style={{ marginTop: 10 }}>{status}</div>
+      {error && <div style={{ color: 'red', marginTop: 10 }}>Error: {error}</div>}
+    </div>
+  );
 } 
