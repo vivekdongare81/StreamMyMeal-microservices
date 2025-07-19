@@ -37,5 +37,6 @@ export const liveStreamsData: { [restaurantId: string]: LiveStream } = {
       { id: "6", user: "SpicyFood", message: "Love the aroma! 🌶️", timestamp: new Date() },
       { id: "7", user: "Thai_Expert", message: "Traditional method!", timestamp: new Date() }
     ]
-  }
+  },
+  
 };
