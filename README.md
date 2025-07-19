@@ -81,5 +81,22 @@ Each microservice in this project can be run as a standalone Spring Boot applica
     docker-compose up -d
   
 
+## WebRTC Live Streaming Service
+
+A new backend service (`live-stream-signaling-service`) is added for handling WebRTC signaling between broadcasters (restaurants) and viewers. This enables real-time live streaming for up to 2-3 restaurants at a time.
+
+### How it works
+- Restaurant owners use a special Broadcaster page to start a live stream.
+- Users can watch the live stream on a Viewer page.
+- The signaling server uses WebSockets (Socket.io) to exchange WebRTC offers/answers/candidates.
+
+### How to run
+1. Go to `live-stream-signaling-service/` and run `npm install && node server.js`.
+2. Start the frontend as usual.
+3. Use the Broadcaster and Viewer pages to test live streaming.
+
+See the code in `live-stream-signaling-service/server.js` and the new pages in `frontend-app/src/pages/Broadcaster.tsx` and `frontend-app/src/pages/Viewer.tsx`.
+  
+
 
 
