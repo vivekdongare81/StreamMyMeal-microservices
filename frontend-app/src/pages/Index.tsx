@@ -214,6 +214,10 @@ const Index = () => {
         </div>
       </section>
 
+      <div className="mt-8 flex gap-4">
+        <a href="/broadcaster" className="px-4 py-2 bg-blue-600 text-white rounded">Go Live (Broadcaster)</a>
+        <a href="/viewer" className="px-4 py-2 bg-green-600 text-white rounded">Watch Live (Viewer)</a>
+      </div>
 
     </div>
   );

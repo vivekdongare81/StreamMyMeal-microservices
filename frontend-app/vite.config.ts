@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+// Add this import for the polyfill
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -24,6 +26,19 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  // Add these lines for the global polyfill
+  define: {
+    global: 'window',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          global: true,
+        }),
+      ],
     },
   },
 }));

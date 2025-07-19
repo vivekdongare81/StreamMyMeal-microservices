@@ -13,6 +13,8 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AdminPanel from "./pages/AdminPanel";
 import { AuthProvider } from "@/lib/authContext";
+import Broadcaster from './pages/Broadcaster';
+import Viewer from './pages/Viewer';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/broadcaster" element={<Broadcaster />} />
+          <Route path="/viewer" element={<Viewer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
