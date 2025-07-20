@@ -16,11 +16,11 @@ export class RestaurantService {
     let backendRestaurants: Restaurant[] = [];
     try {
       const data = await apiClient.get('/restaurants?page=0&size=10', { requiresAuth: false });
-      console.log('[DEBUG] Raw /restaurants response:', data);
+      // console.log('[DEBUG] Raw /restaurants response:', data);
       // Support both array and paginated response
       backendRestaurants = Array.isArray(data) ? data : (data.content || []);
       // Debug: log raw backend data before mapping
-      console.log('[DEBUG] Raw backend restaurant data:', backendRestaurants);
+      // console.log('[DEBUG] Raw backend restaurant data:', backendRestaurants);
       // Normalize backend IDs to string and image to full URL
       backendRestaurants = backendRestaurants.map(r => ({
         id: String((r as any).id !== undefined ? (r as any).id : (r as any).restaurantId),

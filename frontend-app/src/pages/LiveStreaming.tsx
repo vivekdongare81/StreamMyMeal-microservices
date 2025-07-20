@@ -75,6 +75,8 @@ const LiveStreaming = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [showLiveViewer, setShowLiveViewer] = useState(false);
+  const [isBroadcastLive, setIsBroadcastLive] = useState(false);
+  const [viewerCount, setViewerCount] = useState(0);
 
   useEffect(() => {
     const fetchLiveRestaurants = async () => {
@@ -125,6 +127,13 @@ const LiveStreaming = () => {
     fetchLiveRestaurants();
   }, [restaurantId]);
 
+  const handleBroadcastClick = () => {
+    if (previewStream?.id) {
+      window.open(`http://localhost:8080/broadcaster?broadcastId=${previewStream.id}`, '_blank');
+      setIsBroadcastLive(true);
+    }
+  };
+
   const handleCardClick = (stream: LiveStream) => {
     if (!previewStream) return;
     // Move current preview to cards, and clicked card to preview
@@ -164,8 +173,6 @@ const LiveStreaming = () => {
       setIsPlaying(!isPlaying);
     }
   };
-
-  const viewerCount = useLiveViewerCount(previewStream?.id);
 
   if (loading) {
     return (
@@ -218,54 +225,47 @@ const LiveStreaming = () => {
               <div className="relative bg-black aspect-video">
                 {/* Broadcast My Restaurant Button */}
                 <button
-                  onClick={() => {
-                    if (previewStream?.id) {
-                      setShowLiveViewer(true);
-                      window.open(`http://localhost:8080/broadcaster?broadcastId=${previewStream.id}`, '_blank');
-                    }
-                  }}
+                  onClick={handleBroadcastClick}
                   className="absolute top-4 right-4 z-20 bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded shadow-lg transition-all duration-200 animate-glare transform hover:scale-110"
                   style={{ minWidth: 140, fontSize: '0.95rem' }}
                 >
                   Broadcast My Restaurant
                 </button>
-                {/* Video Player */}
-                {showLiveViewer && previewStream?.id ? (
-                  <iframe
-                    src={`http://localhost:8080/viewer?broadcastId=${previewStream.id}`}
-                    title="Live Stream Viewer"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      border: 0,
-                      background: '#000',
-                    }}
-                  />
-                ) : (
-                  <video
-                    ref={videoRef}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    muted
-                    loop
-                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  />
-                )}
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', background: 'black' }}>
+                  {isBroadcastLive && previewStream?.id ? (
+                    <iframe
+                      src={`http://localhost:8080/viewer?broadcastId=${previewStream.id}`}
+                      title="Live Stream Viewer"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 0,
+                        background: '#000',
+                      }}
+                    />
+                  ) : (
+                    <video
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                    />
+                  )}
+                </div>
                 {/* Live Badge */}
-                {previewStream?.isLive && (
-                  <div className="absolute top-4 left-4">
-                    <Badge className="bg-red-500 text-white animate-pulse">
-                      <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
-                      LIVE
-                    </Badge>
-                  </div>
-                )}
+                <div className="absolute top-4 left-4">
+                  <Badge className="bg-red-500 text-white animate-pulse">
+                    <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                    {isBroadcastLive ? `${viewerCount} viewers` : 'Demo'}
+                  </Badge>
+                </div>
                 {/* Stream Stats */}
                 <div className="absolute top-4 right-4 flex gap-2">
                    <span className="bg-black/50 text-white px-3 py-1 text-xs font-semibold">

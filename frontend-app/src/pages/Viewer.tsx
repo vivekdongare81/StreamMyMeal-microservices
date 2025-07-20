@@ -147,7 +147,7 @@ export default function Viewer() {
   }, [location]);
 
   return (
-    <div style={{ width: '100%', height: '100%', background: 'black', position: 'relative' }}>
+    <div style={{ width: '100%', aspectRatio: '16/9', background: 'black', position: 'relative' }}>
       <video
         ref={videoRef}
         autoPlay
@@ -155,6 +155,17 @@ export default function Viewer() {
         muted
         style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'black', display: 'block' }}
       />
+      {error && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', background: 'rgba(0,0,0,0.7)'
+        }}>
+          <div>
+            <h2>No Live Stream</h2>
+            <p>Waiting for broadcast to start...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -23,6 +23,16 @@ const rooms = {}; // { [roomId]: { router, peers: { [peerId]: { transports, prod
   console.log('Mediasoup worker created');
 })();
 
+function logAllLiveBroadcasts() {
+  const liveBroadcasts = Object.entries(rooms)
+    .filter(([roomId, room]) =>
+      room.peers && Object.values(room.peers).some(peer => peer.role === 'broadcaster')
+    )
+    .map(([roomId]) => roomId);
+  console.log(`[SFU] Currently live broadcasts:`, liveBroadcasts);
+  console.log(`[SFU] Total live rooms: ${liveBroadcasts.length}`);
+}
+
 app.get('/api/broadcast/:broadcastId/viewers', (req, res) => {
   const { broadcastId } = req.params;
   const room = rooms[broadcastId];
@@ -32,6 +42,17 @@ app.get('/api/broadcast/:broadcastId/viewers', (req, res) => {
     viewerCount = Object.values(room.peers).filter(peer => peer.role === 'viewer').length;
   }
   res.json({ viewers: viewerCount });
+});
+
+app.get('/api/broadcast/:broadcastId/live', (req, res) => {
+  const { broadcastId } = req.params;
+  const room = rooms[broadcastId];
+  let isLive = false;
+  if (room && room.peers) {
+    // Check if any peer in the room is a broadcaster
+    isLive = Object.values(room.peers).some(peer => peer.role === 'broadcaster');
+  }
+  res.json({ live: isLive });
 });
 
 io.on('connection', socket => {
@@ -66,22 +87,27 @@ io.on('connection', socket => {
     room.peers[peerId] = { transports: [], producers: [], consumers: [], socket, role };
     socket.emit('peer-id', peerId);
     console.log(`[SFU] Peer ${peerId} joined room ${roomId}`);
+    console.log(`[SFU] Role ${role}`);
+
+    if (role === 'broadcaster') {
+      logAllLiveBroadcasts();
+    }
     // Inform the new peer about all existing producers in this room
-    for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
-      if (otherPeerId !== peerId) {
-        for (const producer of otherPeer.producers) {
-          socket.emit('new-producer', { producerId: producer.id, kind: producer.kind });
-        }
-      }
-    }
-    // Notify all broadcasters in the room that a new viewer joined
-    if (role === 'viewer') {
-      for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
-        if (otherPeer.role === 'broadcaster') {
-          otherPeer.socket.emit('new-viewer', { viewerId: peerId });
-        }
-      }
-    }
+    // for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
+    //   if (otherPeerId !== peerId) {
+    //     for (const producer of otherPeer.producers) {
+    //       socket.emit('new-producer', { producerId: producer.id, kind: producer.kind });
+    //     }
+    //   }
+    // }
+    // // Notify all broadcasters in the room that a new viewer joined
+    // if (role === 'viewer') {
+    //   for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
+    //     if (otherPeer.role === 'broadcaster') {
+    //       otherPeer.socket.emit('new-viewer', { viewerId: peerId });
+    //     }
+    //   }
+    // }
     if (cb) cb();
   });
 
@@ -135,6 +161,7 @@ io.on('connection', socket => {
     const transport = room.peers[peerId].transports.find(t => t.id === transportId);
     const producer = await transport.produce({ kind, rtpParameters });
     room.peers[peerId].producers.push(producer);
+    logAllLiveBroadcasts();
     cb({ id: producer.id });
     // Inform all other peers in the room about new producer
     for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
@@ -201,6 +228,7 @@ io.on('connection', socket => {
         console.log(`[SFU] Deleted empty room: ${currentRoomId}`);
       }
       console.log(`[SFU] Peer disconnected: ${peerId} from room ${currentRoomId}`);
+      logAllLiveBroadcasts();
     }
   });
 });

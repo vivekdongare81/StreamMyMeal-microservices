@@ -80,7 +80,7 @@ export default function Broadcaster() {
                           setError('Track produce error: ' + err);
                         }
                       }
-                      setStatus('Broadcasting live!');
+                      setStatus(' Broadcasting live! view stream on live cooking page.');
                     } catch (err) {
                       setError('Create send transport error: ' + err);
                     }

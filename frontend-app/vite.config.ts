@@ -36,7 +36,8 @@ export default defineConfig(({ mode }) => ({
     esbuildOptions: {
       plugins: [
         NodeGlobalsPolyfillPlugin({
-          global: true,
+          buffer: true,
+          process: true,
         }),
       ],
     },
