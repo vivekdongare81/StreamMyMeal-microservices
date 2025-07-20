@@ -46,6 +46,25 @@ const mockMessages: ChatMessage[] = [
   { id: "4", username: "Hungry_Soul", message: "Can you show the spice mix again?", timestamp: "7 min ago" },
 ];
 
+// Custom hook to poll live viewer count
+function useLiveViewerCount(broadcastId: string | undefined) {
+  const [viewerCount, setViewerCount] = useState(0);
+  useEffect(() => {
+    if (!broadcastId) return;
+    let interval = setInterval(async () => {
+      try {
+        const res = await fetch(`http://localhost:4000/api/broadcast/${broadcastId}/viewers`);
+        const data = await res.json();
+        setViewerCount(data.viewers);
+      } catch {
+        setViewerCount(0);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [broadcastId]);
+  return viewerCount;
+}
+
 const LiveStreaming = () => {
   const { restaurantId } = useParams();
   const [isPlaying, setIsPlaying] = useState(true);
@@ -55,6 +74,7 @@ const LiveStreaming = () => {
   const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [showLiveViewer, setShowLiveViewer] = useState(false);
 
   useEffect(() => {
     const fetchLiveRestaurants = async () => {
@@ -145,6 +165,8 @@ const LiveStreaming = () => {
     }
   };
 
+  const viewerCount = useLiveViewerCount(previewStream?.id);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -178,7 +200,7 @@ const LiveStreaming = () => {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="text-center py-8">
-          <div className="text-gray-500 text-lg mb-2">🔴 No Live Streams</div>
+          <div className="text-gray-500 text-lg mb-2">No Live Streams</div>
           <p className="text-gray-400">No restaurants are currently live streaming</p>
         </div>
       </div>
@@ -196,33 +218,44 @@ const LiveStreaming = () => {
               <div className="relative bg-black aspect-video">
                 {/* Broadcast My Restaurant Button */}
                 <button
-                  onClick={() => alert('Broadcast My Restaurant clicked!')}
+                  onClick={() => {
+                    if (previewStream?.id) {
+                      setShowLiveViewer(true);
+                      window.open(`http://localhost:8080/broadcaster?broadcastId=${previewStream.id}`, '_blank');
+                    }
+                  }}
                   className="absolute top-4 right-4 z-20 bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded shadow-lg transition-all duration-200 animate-glare transform hover:scale-110"
                   style={{ minWidth: 140, fontSize: '0.95rem' }}
                 >
                   Broadcast My Restaurant
                 </button>
                 {/* Video Player */}
-                {previewStream?.streamUrl ? (
+                {showLiveViewer && previewStream?.id ? (
+                  <iframe
+                    src={`http://localhost:8080/viewer?broadcastId=${previewStream.id}`}
+                    title="Live Stream Viewer"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      border: 0,
+                      background: '#000',
+                    }}
+                  />
+                ) : (
                   <video
                     ref={videoRef}
                     className="w-full h-full object-cover"
                     autoPlay
                     muted
                     loop
-                    src={previewStream.streamUrl}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                   />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                        {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
-                      </div>
-                      <p className="text-sm">Loading live stream...</p>
-                    </div>
-                  </div>
                 )}
                 {/* Live Badge */}
                 {previewStream?.isLive && (
@@ -268,7 +301,7 @@ const LiveStreaming = () => {
                   <div className="flex gap-2">
                     <Badge variant="secondary" className="bg-black/50 text-white">
                       <Users className="w-3 h-3 mr-1" />
-                      {previewStream?.viewersCount || previewStream?.viewers || 0} viewers
+                      {viewerCount} viewers
                     </Badge>
                     <Button variant="outline" size="sm">
                       <Share2 className="w-4 h-4" />

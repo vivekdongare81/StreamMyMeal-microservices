@@ -147,10 +147,14 @@ export default function Viewer() {
   }, [location]);
 
   return (
-    <div>
-      <video ref={videoRef} autoPlay controls muted style={{ width: 400, height: 300, background: 'black' }} />
-      <button onClick={() => videoRef.current && videoRef.current.play()}>Play Video</button>
-      <div style={{ marginTop: 10 }}>{status}</div>
+    <div style={{ width: '100%', height: '100%', background: 'black', position: 'relative' }}>
+      <video
+        ref={videoRef}
+        autoPlay
+        controls
+        muted
+        style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'black', display: 'block' }}
+      />
     </div>
   );
 } 

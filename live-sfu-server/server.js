@@ -5,8 +5,10 @@ const mediasoup = require('mediasoup');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config({ path: '../setup-local/.env' });
 const announcedIp = process.env.SFU_ANNOUNCED_IP;
+const cors = require('cors');
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:8080' }));
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
@@ -20,6 +22,17 @@ const rooms = {}; // { [roomId]: { router, peers: { [peerId]: { transports, prod
   worker = await mediasoup.createWorker();
   console.log('Mediasoup worker created');
 })();
+
+app.get('/api/broadcast/:broadcastId/viewers', (req, res) => {
+  const { broadcastId } = req.params;
+  const room = rooms[broadcastId];
+  let viewerCount = 0;
+  if (room && room.peers) {
+    // Count peers with role 'viewer'
+    viewerCount = Object.values(room.peers).filter(peer => peer.role === 'viewer').length;
+  }
+  res.json({ viewers: viewerCount });
+});
 
 io.on('connection', socket => {
   let currentRoomId = null;
