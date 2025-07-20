@@ -18,12 +18,6 @@ export default function CheckoutPage() {
       return;
     }
     // In a real app, you would submit the order to your backend here
-    console.log('Order placed with:', {
-      address: selectedAddress,
-      paymentMethod: 'CASH_ON_DELIVERY',
-      items,
-      total
-    });
     setOrderPlaced(true);
   };
 

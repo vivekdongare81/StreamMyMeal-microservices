@@ -5,6 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "live_session")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,15 +15,23 @@ public class LiveSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
  
-    @Column(nullable = false, unique = true)
-    private String restaurantId;
+    @Column(name = "restaurant_id", nullable = false)
+    private Integer restaurantId;
 
-    @Column(nullable = false, unique = true)
-    private String roomId;
+    @Column(name = "broadcast_id", nullable = false, unique = true)
+    private String broadcastId;
 
-    @Column(nullable = false)
-    private boolean isLive;
+    @Column(name = "is_live", nullable = false)
+    @Builder.Default
+    private boolean isLive = false;
 
+    @Column(name = "started_at")
     private LocalDateTime startedAt;
+    
+    @Column(name = "ended_at")
     private LocalDateTime endedAt;
+
+    @Column(name = "viewers_count")
+    @Builder.Default
+    private Integer viewersCount = 0;
 } 

@@ -21,6 +21,20 @@ spring:
                 redis-rate-limiter.replenishRate: 10 # 10 request mỗi giây
                 redis-rate-limiter.burstCapacity: 50 # có thể chứa tối đa 20 request tại bất kỳ thời điểm nào.
                 redis-rate-limiter.requestedTokens: 1 # mỗi request sẽ tiêu tốn 1 token
+        - id: live-streaming-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/v1/live-sessions/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: liveStreamingCircuitBreaker
+                fallbackUri: forward:/fallback/live-streaming
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 50
+                redis-rate-limiter.requestedTokens: 1
         - id: order-service
           uri: http://localhost:8083
           predicates:
@@ -80,6 +94,8 @@ resilience4j:
     instances:
       restaurantCircuitBreaker:
         aseConfig: default
+      liveStreamingCircuitBreaker:
+        aseConfig: default
       orderCircuitBreaker:
         aseConfig: default
       userCircuitBreaker:
@@ -108,3 +124,8 @@ management:
   health:
     circuitbreakers:
       enabled: true
+
+# JWT Configuration
+jwt:
+  secretKey: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+  expiration: 86400000

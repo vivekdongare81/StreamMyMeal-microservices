@@ -6,6 +6,7 @@ import { RestaurantService } from "@/services";
 import { toast } from "sonner";
 import { MenuService } from "@/services/menuService";
 import { Restaurant } from "@/data/types";
+import { apiClient } from "@/lib/api";
 
 const AdminPanel = () => {
   const [tab, setTab] = useState("restaurant");
@@ -19,23 +20,26 @@ const AdminPanel = () => {
   const PAGE_SIZE = 10;
 
   const loadRestaurants = async (pageNum = 0) => {
-    const res = await fetch(`/api/v1/restaurants?page=${pageNum}&size=${PAGE_SIZE}`);
-    const data = await res.json();
-    setRestaurants(data.content.map((r: any) => ({
-      id: String(r.id ?? r.restaurantId),
-      name: r.name,
-      address: r.address,
-      image: r.image,
-      cuisine: r.cuisine ?? '',
-      rating: r.rating ?? 0,
-      deliveryTime: r.deliveryTime ?? '',
-      location: r.location ?? '',
-      isLive: r.isLive ?? false,
-      viewers: r.viewers ?? 0,
-      priceRange: r.priceRange ?? '',
-    })));
-    setTotalPages(data.totalPages);
-    setPage(data.number);
+    try {
+      const data = await apiClient.get(`/restaurants?page=${pageNum}&size=${PAGE_SIZE}`);
+      setRestaurants(data.content.map((r: any) => ({
+        id: String(r.id ?? r.restaurantId),
+        name: r.name,
+        address: r.address,
+        image: r.image,
+        cuisine: r.cuisine ?? '',
+        rating: r.rating ?? 0,
+        deliveryTime: r.deliveryTime ?? '',
+        location: r.location ?? '',
+        isLive: r.isLive ?? false,
+        viewers: r.viewers ?? 0,
+        priceRange: r.priceRange ?? '',
+      })));
+      setTotalPages(data.totalPages);
+      setPage(data.number);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to load restaurants');
+    }
   };
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const AdminPanel = () => {
       if (imageFile && restaurantId) {
         await RestaurantService.uploadRestaurantImage(restaurantId, imageFile);
       }
-      toast.success("Restaurant added successfully!");
+      toast.success("Restaurant added successfully! Live session created automatically.");
       setNewRestaurant({ name: "", address: "" });
       setImageFile(null);
       // Prepend the new restaurant to the list
@@ -139,6 +143,7 @@ const AdminPanel = () => {
             <Button type="submit">Add Menu Item</Button>
           </form>
         )}
+
         <div className="mb-8 mt-12"> {/* Added mt-12 for extra space above */}
           <h2 className="text-2xl font-semibold mb-2">Listed Restaurants</h2>
           <table className="min-w-full border text-left mb-4">

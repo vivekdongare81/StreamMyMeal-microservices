@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS password_reset_token (
     used BOOLEAN NOT NULL DEFAULT FALSE
 );
 
--- Seed admin user (V2)
+-- Seed admin user with proper BCrypt hash for password "admin123"
 INSERT INTO users (username, email, password, is_active)
-SELECT 'Admin', 'admin@streammymeal.com', '$2a$10$Dow1Qw1Qw1Qw1Qw1Qw1QwOeQw1Qw1Qw1Qw1Qw1Qw1Qw1Qw1Qw1', TRUE
+SELECT 'Admin', 'admin@streammymeal.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDa', TRUE
 WHERE NOT EXISTS (
   SELECT 1 FROM users WHERE email = 'admin@streammymeal.com'
 );

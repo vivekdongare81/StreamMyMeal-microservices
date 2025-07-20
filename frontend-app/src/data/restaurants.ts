@@ -1,29 +1,29 @@
 import { Restaurant } from './types';
 
 export const restaurantsData: Restaurant[] = [
-  {
-    id: "1",
-    name: "Spice Garden",
-    cuisine: "Indian",
-    rating: 4.5,
-    deliveryTime: "30-45 min",
-    location: "Downtown",
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop",
-    isLive: true,
-    viewers: 156,
-    priceRange: "₹₹"
-  },
-  {
-    id: "2",
-    name: "Mama's Kitchen",
-    cuisine: "Italian",
-    rating: 4.7,
-    deliveryTime: "25-40 min",
-    location: "City Center",
-    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop",
-    isLive: false,
-    priceRange: "₹₹₹"
-  },
+  // {
+  //   id: "1",
+  //   name: "Spice Garden",
+  //   cuisine: "Indian",
+  //   rating: 4.5,
+  //   deliveryTime: "30-45 min",
+  //   location: "Downtown",
+  //   image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop",
+  //   isLive: true,
+  //   viewers: 156,
+  //   priceRange: "₹₹"
+  // },
+  // {
+  //   id: "2",
+  //   name: "Mama's Kitchen",
+  //   cuisine: "Italian",
+  //   rating: 4.7,
+  //   deliveryTime: "25-40 min",
+  //   location: "City Center",
+  //   image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop",
+  //   isLive: false,
+  //   priceRange: "₹₹₹"
+  // },
   // {
   //   id: "3",
   //   name: "Sushi Master",

@@ -41,6 +41,7 @@ const Navbar = () => {
       navigate(`/restaurants?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery("");
+      return;
     }
   };
 
@@ -64,7 +65,7 @@ const Navbar = () => {
             {/* Chef Hat and Moustache PNG Logo */}
             <span className="w-8 h-8 flex items-center justify-center">
               <img
-                src="https://www.svgheart.com/wp-content/uploads/2022/07/chef-hat-and-moustache_524-430-min.png"
+                src="/chef-hat-and-moustache.png"
                 alt="Chef Hat Logo"
                 className="w-8 h-8 object-contain"
                 style={{ display: 'block' }}

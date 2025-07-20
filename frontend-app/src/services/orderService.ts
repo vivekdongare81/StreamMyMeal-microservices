@@ -1,15 +1,16 @@
 import { CartService } from './cartService';
+import { apiClient } from '@/lib/api';
 
-interface OrderData {
-  customerInfo: {
+export interface OrderData {
+  items: Array<{
+    id: string;
     name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  paymentMethod: string;
-  items: any[];
+    price: number;
+    quantity: number;
+  }>;
   total: number;
+  deliveryAddress: string;
+  paymentMethod: string;
 }
 
 export class OrderService {
@@ -33,18 +34,10 @@ export class OrderService {
   }
 
   static async getOrdersByUser(userId: string, page = 0, size = 10) {
-    const res = await fetch(`/api/v1/orders/user/${userId}?page=${page}&size=${size}`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch orders');
-    return res.json();
+    return apiClient.get(`/orders/user/${userId}?page=${page}&size=${size}`);
   }
 
   static async getOrderById(orderId: string | number) {
-    const res = await fetch(`/api/v1/orders/${orderId}`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch order details');
-    return res.json();
+    return apiClient.get(`/orders/${orderId}`);
   }
 }

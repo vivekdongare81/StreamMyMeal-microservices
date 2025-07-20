@@ -23,46 +23,163 @@ public class LiveSessionService {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Start a new live streaming session
+     */
     @Transactional
-    public LiveSession startSession(String restaurantId, String broadcastId) {
+    public LiveSession startSession(Integer restaurantId, String broadcastId) {
+        // Check if restaurant already has an active session
         Optional<LiveSession> existing = repository.findByRestaurantId(restaurantId);
-        LiveSession session = existing.orElse(
-            LiveSession.builder()
-                .restaurantId(restaurantId)
-                .roomId(broadcastId)
-                .build()
-        );
-        session.setLive(true);
-        session.setStartedAt(LocalDateTime.now());
-        session.setEndedAt(null);
+        if (existing.isPresent() && existing.get().isLive()) {
+            throw new IllegalStateException("Restaurant " + restaurantId + " already has an active live session");
+        }
+
+        LiveSession session = LiveSession.builder()
+            .restaurantId(restaurantId)
+            .broadcastId(broadcastId)
+            .isLive(true)
+            .startedAt(LocalDateTime.now())
+            .endedAt(null)
+            .viewersCount(0)
+            .build();
+
         session = repository.save(session);
+        
         // Call SFU to create/start the broadcast
         try {
             restTemplate.postForEntity(sfuApiUrl, Map.of("broadcastId", broadcastId), Void.class);
         } catch (Exception e) {
-            // Optionally log or handle error
+            // Log error but don't fail the session creation
+            System.err.println("Failed to call SFU API: " + e.getMessage());
         }
+        
         return session;
     }
 
+    /**
+     * Stop an active live streaming session
+     */
     @Transactional
-    public void stopSession(String restaurantId) {
-        repository.findByRestaurantId(restaurantId).ifPresent(session -> {
-            session.setLive(false);
-            session.setEndedAt(LocalDateTime.now());
-            repository.save(session);
-        });
+    public LiveSession stopSession(Integer restaurantId) {
+        Optional<LiveSession> existing = repository.findByRestaurantId(restaurantId);
+        if (existing.isEmpty() || !existing.get().isLive()) {
+            throw new IllegalStateException("No active live session found for restaurant " + restaurantId);
+        }
+
+        LiveSession session = existing.get();
+        session.setLive(false);
+        session.setEndedAt(LocalDateTime.now());
+        return repository.save(session);
     }
 
-    public Optional<LiveSession> getByRestaurantId(String restaurantId) {
+    /**
+     * Update viewer count for a live session
+     */
+    @Transactional
+    public LiveSession updateViewerCount(Integer restaurantId, Integer newViewerCount) {
+        Optional<LiveSession> existing = repository.findByRestaurantId(restaurantId);
+        if (existing.isEmpty()) {
+            throw new IllegalStateException("No live session found for restaurant " + restaurantId);
+        }
+
+        LiveSession session = existing.get();
+        session.setViewersCount(newViewerCount);
+        return repository.save(session);
+    }
+
+    /**
+     * Create a new live session (manual creation)
+     */
+    @Transactional
+    public LiveSession createSession(Integer restaurantId, String broadcastId, boolean isLive) {
+        // Check if broadcast ID already exists
+        Optional<LiveSession> existing = repository.findByBroadcastId(broadcastId);
+        if (existing.isPresent()) {
+            throw new IllegalStateException("Broadcast ID " + broadcastId + " already exists");
+        }
+
+        LiveSession session = LiveSession.builder()
+            .restaurantId(restaurantId)
+            .broadcastId(broadcastId)
+            .isLive(isLive)
+            .startedAt(isLive ? LocalDateTime.now() : null)
+            .endedAt(null)
+            .viewersCount(0)
+            .build();
+
+        return repository.save(session);
+    }
+
+    /**
+     * Create a live session for a new restaurant (called when restaurant is created)
+     */
+    @Transactional
+    public LiveSession createSessionForNewRestaurant(Integer restaurantId) {
+        // Check if restaurant already has a session
+        Optional<LiveSession> existing = repository.findByRestaurantId(restaurantId);
+        if (existing.isPresent()) {
+            // If session exists, just return it
+            return existing.get();
+        }
+
+        // Create a new inactive session for the restaurant
+        String broadcastId = "broadcast-" + restaurantId + "-" + System.currentTimeMillis();
+        LiveSession session = LiveSession.builder()
+            .restaurantId(restaurantId)
+            .broadcastId(broadcastId)
+            .isLive(true) // Start as inactive
+            .startedAt(null)
+            .endedAt(null)
+            .viewersCount(0)
+            .build();
+
+        return repository.save(session);
+    }
+
+    /**
+     * Save or update a live session
+     */
+    @Transactional
+    public LiveSession saveSession(LiveSession session) {
+        return repository.save(session);
+    }
+
+    /**
+     * Get live session by restaurant ID
+     */
+    public Optional<LiveSession> getByRestaurantId(Integer restaurantId) {
         return repository.findByRestaurantId(restaurantId);
     }
 
-    public Optional<LiveSession> getByRoomId(String roomId) {
-        return repository.findByRoomId(roomId);
+    /**
+     * Get live session by broadcast ID
+     */
+    public Optional<LiveSession> getByBroadcastId(String broadcastId) {
+        return repository.findByBroadcastId(broadcastId);
     }
 
+    /**
+     * Get all currently live sessions
+     */
     public List<LiveSession> getAllLiveSessions() {
         return repository.findByIsLiveTrue();
+    }
+
+    /**
+     * Get live streaming history for a restaurant
+     */
+    public List<LiveSession> getRestaurantHistory(Integer restaurantId) {
+        return repository.findByRestaurantIdOrderByStartedAtDesc(restaurantId);
+    }
+
+    /**
+     * Get all sessions (for admin purposes)
+     */
+    public List<LiveSession> getAllSessions() {
+        return repository.findAll();
+    }
+
+    public void deleteSessionsByRestaurant(Integer restaurantId) {
+        repository.deleteAll(repository.findByRestaurantId(restaurantId).stream().toList());
     }
 } 

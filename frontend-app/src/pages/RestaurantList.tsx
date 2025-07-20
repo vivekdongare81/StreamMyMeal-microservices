@@ -9,59 +9,51 @@ import Navbar from "@/components/Navbar";
 import { RestaurantService, Restaurant } from "@/services";
 import { restaurantsData as dummyRestaurants } from '../data/restaurants';
 
+const PAGE_SIZE = 15;
+
 const RestaurantList = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
 
   const cuisines = ["All", "Indian", "Italian", "Chinese","Japanese", "American", "Thai"];
 
-  useEffect(() => {
-    // Set cuisine filter from URL if present
-    const cuisineParam = searchParams.get('cuisine');
-    if (cuisineParam && cuisines.includes(cuisineParam)) {
-      setSelectedCuisine(cuisineParam);
-    } else {
-      setSelectedCuisine("All");
+  const loadRestaurants = async () => {
+    setLoading(true);
+    try {
+      const data = await RestaurantService.getRestaurants();
+      setRestaurants(data);
+    } catch (error) {
+      setRestaurants([]);
+      console.error('Error loading restaurants:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const loadRestaurants = async () => {
-      try {
-        const searchQuery = searchParams.get('search');
-        let data;
-        if (searchQuery) {
-          data = await RestaurantService.searchRestaurants(searchQuery);
-          setSearchTerm(searchQuery);
-        } else {
-          data = await RestaurantService.getRestaurants();
-        }
-        // Merge backend and dummy data (append dummy if not present)
-        const merged = [
-          ...data,
-          ...dummyRestaurants.filter(
-            d => !data.some(r => r.name === d.name)
-          )
-        ];
-        setRestaurants(merged);
-      } catch (error) {
-        // If backend fails, just use dummy data
-        setRestaurants(dummyRestaurants);
-        console.error('Error loading restaurants:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
     loadRestaurants();
-  }, [searchParams]);
+  }, []);
+
+  // Filter restaurants by search term and cuisine
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      loadRestaurants();
+      return;
+    }
+    // Backend search
+    setLoading(true);
+    RestaurantService.searchRestaurants(searchTerm.trim())
+      .then(results => setRestaurants(results))
+      .catch(() => setRestaurants([]))
+      .finally(() => setLoading(false));
+  }, [searchTerm]);
 
   const filteredRestaurants = restaurants.filter(restaurant => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCuisine = selectedCuisine === "All" || restaurant.cuisine === selectedCuisine;
-    return matchesSearch && matchesCuisine;
+    return matchesCuisine;
   });
 
   return (
@@ -79,8 +71,9 @@ const RestaurantList = () => {
               <Input
                 placeholder="Search restaurants or cuisines..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                readOnly
+                className="pl-10 cursor-pointer bg-gray-100"
+                onClick={() => {}}
               />
             </div>
             
@@ -138,7 +131,8 @@ const RestaurantList = () => {
             ))
           ) : (
             filteredRestaurants.map((restaurant) => (
-            <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
+              (() => { console.log('[DEBUG] RestaurantList id:', restaurant.id); return null; })(),
+              <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
               <div className="relative">
                 <img
                   src={restaurant.image}

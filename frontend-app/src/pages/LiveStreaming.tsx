@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
-import { RestaurantService, LiveStreamService, Restaurant, LiveStream } from "@/services";
+import { RestaurantService, LiveStreamService, Restaurant, LiveStream, LiveRestaurant } from "@/services";
 import { restaurantsData } from "../data/restaurants";
 import { liveStreamsData } from '../data/liveStreams';
 
@@ -16,7 +16,6 @@ interface LiveStreamData {
   restaurantName: string;
   chefName: string;
   dishName: string;
-  viewers: number;
   likes: number;
   duration: string;
   isLive: boolean;
@@ -35,7 +34,6 @@ const mockStreamData: LiveStreamData = {
   restaurantName: "Spice Garden",
   chefName: "Chef Rahul",
   dishName: "Butter Chicken with Naan",
-  viewers: 156,
   likes: 89,
   duration: "15:30",
   isLive: true
@@ -54,35 +52,90 @@ const LiveStreaming = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [previewStream, setPreviewStream] = useState<LiveStream | null>(null);
   const [otherStreams, setOtherStreams] = useState<LiveStream[]>([]);
-  const [likes, setLikes] = useState(0);
-  const [hasLiked, setHasLiked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // On mount, set the first stream as preview, rest as cards
-    const streams = Object.values(liveStreamsData);
-    if (streams.length > 0) {
-      setPreviewStream(streams[0]);
-      setLikes(streams[0].viewers || 0);
-      setOtherStreams(streams.slice(1));
-    }
+    fetchLiveRestaurants();
   }, []);
+
+  const fetchLiveRestaurants = async () => {
+    try {
+      setLoading(true);
+      const liveRestaurants = await LiveStreamService.getLiveRestaurants();
+      
+      if (liveRestaurants.length > 0) {
+        // Convert LiveRestaurant to LiveStream format for the UI
+        const convertedStreams: LiveStream[] = liveRestaurants.map(restaurant => ({
+          id: restaurant.liveSession.broadcastId,
+          restaurantId: restaurant.restaurantId.toString(),
+          title: `${restaurant.name} - Live Cooking Session`,
+          viewers: restaurant.liveSession.viewersCount,
+          viewersCount: restaurant.liveSession.viewersCount,
+          isLive: restaurant.liveSession.isLive,
+          image: restaurant.image, // Use backend image
+          streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Set dummy video URL
+          chatMessages: [
+            { id: "1", user: "FoodLover123", message: "Looks amazing! 😍", timestamp: new Date() },
+            { id: "2", user: "Chef_Fan", message: "What spices are you using?", timestamp: new Date() },
+            { id: "3", user: "Hungry_User", message: "Can't wait to order this!", timestamp: new Date() }
+          ]
+        }));
+
+        setPreviewStream(convertedStreams[0]);
+        setOtherStreams(convertedStreams.slice(1));
+        setError(null);
+      } else {
+        // Fallback to dummy data if no backend streams
+        const streams = Object.values(liveStreamsData);
+        if (streams.length > 0) {
+          setPreviewStream(streams[0]);
+          setOtherStreams(streams.slice(1));
+        }
+      }
+    } catch (err) {
+      setError('Failed to fetch live restaurants');
+      console.error('Error:', err);
+      // Fallback to dummy data on error
+      const streams = Object.values(liveStreamsData);
+      if (streams.length > 0) {
+        setPreviewStream(streams[0]);
+        setOtherStreams(streams.slice(1));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCardClick = (stream: LiveStream) => {
     if (!previewStream) return;
     // Move current preview to cards, and clicked card to preview
     setOtherStreams(prev => [previewStream!, ...prev.filter(s => s.id !== stream.id)]);
-    setPreviewStream(stream);
-    setLikes(stream.viewers || 0);
-    setHasLiked(false);
-  };
-
-  const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(prev => prev + 1);
-      setHasLiked(true);
-    }
+    
+    // Set the dummy video URL for the clicked stream and reset chat
+    const streamWithVideo = {
+      ...stream,
+      streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      chatMessages: [
+        { id: "1", user: "FoodLover123", message: "Looks amazing! 😍", timestamp: new Date() },
+        { id: "2", user: "Chef_Fan", message: "What spices are you using?", timestamp: new Date() },
+        { id: "3", user: "Hungry_User", message: "Can't wait to order this!", timestamp: new Date() }
+      ]
+    };
+    
+    setPreviewStream(streamWithVideo);
+    
+    // Restart video by forcing a reload
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.load();
+        videoRef.current.play().catch(() => {
+          console.log('Video autoplay prevented');
+        });
+      }
+    }, 100);
   };
 
   const togglePlayPause = () => {
@@ -96,7 +149,45 @@ const LiveStreaming = () => {
     }
   };
 
-  if (!previewStream) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex justify-center items-center min-h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !previewStream) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="text-center py-8">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchLiveRestaurants}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!previewStream) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="text-center py-8">
+          <div className="text-gray-500 text-lg mb-2">🔴 No Live Streams</div>
+          <p className="text-gray-400">No restaurants are currently live streaming</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,10 +239,10 @@ const LiveStreaming = () => {
                 )}
                 {/* Stream Stats */}
                 <div className="absolute top-4 right-4 flex gap-2">
-                  <Badge variant="secondary" className="bg-black/50 text-white">
-                    <Users className="w-3 h-3 mr-1" />
-                    {previewStream?.viewers || 0}
-                  </Badge>
+                   <span className="bg-black/50 text-white px-3 py-1 text-xs font-semibold">
+                      <Users className="w-3 h-3 mr-1 inline" />
+                      {previewStream?.viewersCount || previewStream?.viewers || 0} viewers
+                    </span>
                 </div>
                 {/* Play/Pause Overlay */}
                 <button
@@ -169,10 +260,10 @@ const LiveStreaming = () => {
                     <h1 className="text-2xl font-bold mb-2">{previewStream?.title || "Live Cooking Session"}</h1>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleLike}>
-                      <Heart className={`w-4 h-4 mr-1 ${hasLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                      {likes}
-                    </Button>
+                    <Badge variant="secondary" className="bg-black/50 text-white">
+                      <Users className="w-3 h-3 mr-1" />
+                      {previewStream?.viewersCount || previewStream?.viewers || 0} viewers
+                    </Badge>
                     <Button variant="outline" size="sm">
                       <Share2 className="w-4 h-4" />
                     </Button>
@@ -213,6 +304,65 @@ const LiveStreaming = () => {
                 ))}
                 <div ref={chatEndRef} />
               </div>
+              {/* Chat Input Section */}
+              <div className="p-4 border-t">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type your message..."
+                    className="flex-1"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                        const newMessage = {
+                          id: Date.now().toString(),
+                          user: "You",
+                          message: e.currentTarget.value.trim(),
+                          timestamp: new Date()
+                        };
+                        if (previewStream) {
+                          const updatedStream = {
+                            ...previewStream,
+                            chatMessages: [...(previewStream.chatMessages || []), newMessage]
+                          };
+                          setPreviewStream(updatedStream);
+                        }
+                        e.currentTarget.value = '';
+                        // Scroll to bottom
+                        setTimeout(() => {
+                          chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                      }
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                      if (input && input.value.trim()) {
+                        const newMessage = {
+                          id: Date.now().toString(),
+                          user: "You",
+                          message: input.value.trim(),
+                          timestamp: new Date()
+                        };
+                        if (previewStream) {
+                          const updatedStream = {
+                            ...previewStream,
+                            chatMessages: [...(previewStream.chatMessages || []), newMessage]
+                          };
+                          setPreviewStream(updatedStream);
+                        }
+                        input.value = '';
+                        // Scroll to bottom
+                        setTimeout(() => {
+                          chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                      }
+                    }}
+                  >
+                    Send
+                  </Button>
+                </div>
+              </div>
             </Card>
           </div>
         </div>
@@ -225,7 +375,7 @@ const LiveStreaming = () => {
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <img
-                      src={restaurantsData.find(r => r.id === stream.restaurantId)?.image || "https://via.placeholder.com/300x200?text=No+Image"}
+                      src={stream.image || "https://via.placeholder.com/300x200?text=No+Image"}
                       alt={stream.title}
                       className="w-full h-32 object-cover"
                     />
@@ -238,7 +388,7 @@ const LiveStreaming = () => {
                     <div className="absolute top-2 right-2">
                       <Badge variant="secondary" className="bg-black/50 text-white text-xs">
                         <Users className="w-2 h-2 mr-1" />
-                        {stream.viewers}
+                        {stream.viewersCount || stream.viewers}
                       </Badge>
                     </div>
                   </div>

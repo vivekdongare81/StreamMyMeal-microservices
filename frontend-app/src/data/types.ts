@@ -36,9 +36,11 @@ export interface LiveStream {
   restaurantId: string;
   title: string;
   viewers: number;
+  viewersCount: number;
   isLive: boolean;
+  image?: string;
   streamUrl: string;
-  chatMessages: ChatMessage[];
+  chatMessages: any[];
 }
 
 export interface ChatMessage {

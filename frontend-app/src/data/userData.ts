@@ -72,37 +72,37 @@ export const currentUser: UserProfile = {
 };
 
 export const userOrders: Order[] = [
-  {
-    id: 'order-1',
-    userId: 'user-1',
-    restaurantId: '1',
-    restaurantName: 'Pizza Palace',
-    items: [
-      { id: 'item-1', name: 'Margherita Pizza', quantity: 2, price: 199 },
-      { id: 'item-2', name: 'Garlic Bread', quantity: 1, price: 99 }
-    ],
-    totalAmount: 497, // (199 * 2) + 99
-    deliveryAddress: '123 Main Street, Mumbai, Maharashtra 400001',
-    status: 'DELIVERED',
-    orderTime: '2025-07-10T18:30:00.000Z',
-    deliveryTime: '2025-07-10T19:15:00.000Z',
-    paymentMethod: 'CASH_ON_DELIVERY'
-  },
-  {
-    id: 'order-2',
-    userId: 'user-1',
-    restaurantId: '3',
-    restaurantName: 'Burger King',
-    items: [
-      { id: 'item-3', name: 'Whopper', quantity: 1, price: 199 },
-      { id: 'item-4', name: 'French Fries', quantity: 2, price: 99 },
-      { id: 'item-5', name: 'Coke', quantity: 1, price: 49 }
-    ],
-    totalAmount: 446, // 199 + (99 * 2) + 49
-    deliveryAddress: '123 Main Street, Mumbai, Maharashtra 400001',
-    status: 'ON_THE_WAY',
-    orderTime: '2025-07-12T19:00:00.000Z',
-    paymentMethod: 'STRIPE',
-    deliveryInstructions: 'Please call before delivery'
-  }
+  // {
+  //   id: 'order-1',
+  //   userId: 'user-1',
+  //   restaurantId: '1',
+  //   restaurantName: 'Pizza Palace',
+  //   items: [
+  //     { id: 'item-1', name: 'Margherita Pizza', quantity: 2, price: 199 },
+  //     { id: 'item-2', name: 'Garlic Bread', quantity: 1, price: 99 }
+  //   ],
+  //   totalAmount: 497, // (199 * 2) + 99
+  //   deliveryAddress: '123 Main Street, Mumbai, Maharashtra 400001',
+  //   status: 'DELIVERED',
+  //   orderTime: '2025-07-10T18:30:00.000Z',
+  //   deliveryTime: '2025-07-10T19:15:00.000Z',
+  //   paymentMethod: 'CASH_ON_DELIVERY'
+  // },
+  // {
+  //   id: 'order-2',
+  //   userId: 'user-1',
+  //   restaurantId: '3',
+  //   restaurantName: 'Burger King',
+  //   items: [
+  //     { id: 'item-3', name: 'Whopper', quantity: 1, price: 199 },
+  //     { id: 'item-4', name: 'French Fries', quantity: 2, price: 99 },
+  //     { id: 'item-5', name: 'Coke', quantity: 1, price: 49 }
+  //   ],
+  //   totalAmount: 446, // 199 + (99 * 2) + 49
+  //   deliveryAddress: '123 Main Street, Mumbai, Maharashtra 400001',
+  //   status: 'ON_THE_WAY',
+  //   orderTime: '2025-07-12T19:00:00.000Z',
+  //   paymentMethod: 'STRIPE',
+  //   deliveryInstructions: 'Please call before delivery'
+  // }
 ];

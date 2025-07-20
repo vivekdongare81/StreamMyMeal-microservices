@@ -22,4 +22,7 @@ public class Restaurant {
     private String address;
 
     private String image;
+
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
+    private java.util.List<MenuItem> menuItems;
 }

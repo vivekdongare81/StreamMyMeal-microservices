@@ -1,3 +1,5 @@
+import { apiClient } from '@/lib/api';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -24,42 +26,25 @@ export interface ProfileResponse {
   newJwtToken?: string;
 }
 
-const API_BASE = '/api/v1';
-
 export const userService = {
   async login({ email, password }: LoginRequest): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    if (!res.ok) throw new Error('Invalid credentials');
-    return res.json();
+    return apiClient.post('/auth/login', { email, password }, { requiresAuth: false });
   },
 
   async register({ username, email, password, address }: RegisterRequest): Promise<AuthResponse> {
-    const res = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password, address })
-    });
-    if (!res.ok) {
+    try {
+      return await apiClient.post('/auth/register', { username, email, password, address }, { requiresAuth: false });
+    } catch (error: any) {
       let errorMsg = 'Registration failed';
-      try {
-        const data = await res.json();
-        errorMsg = data.message || errorMsg;
-      } catch {}
+      if (error.message) {
+        errorMsg = error.message;
+      }
       throw new Error(errorMsg);
     }
-    return res.json();
   },
 
   async getProfile(token: string): Promise<ProfileResponse> {
-    const res = await fetch(`${API_BASE}/users/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch profile');
-    return res.json();
+    return apiClient.get('/users/profile');
   },
 
   async updateProfile(token: string, profile: Partial<ProfileResponse>): Promise<ProfileResponse> {
@@ -69,29 +54,17 @@ export const userService = {
     if ((profile as any).image) {
       formData.append('image', (profile as any).image);
     }
-    const res = await fetch(`${API_BASE}/users/profile`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: formData
-    });
-    if (!res.ok) throw new Error('Failed to update profile');
-    return res.json();
+    return apiClient.upload('/users/profile', formData, { method: 'PUT' });
   },
+
   async updateProfileById(userId: number, token: string, profile: Partial<ProfileResponse>): Promise<ProfileResponse> {
-    const res = await fetch(`/api/v1/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(profile)
-    });
-    if (!res.ok) throw new Error('Failed to update profile by userId');
-    return res.json();
+    return apiClient.put(`/users/${userId}`, profile);
   },
+
   logout() {
     localStorage.removeItem('token');
   },
+
   isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));

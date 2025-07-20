@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, Play, Star, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { RestaurantService, Restaurant } from "@/services";
+import { LiveStreamService } from "@/services/liveStreamService";
 import CuisinePosters from "../components/CuisinePosters";
 
 const Index = () => {
@@ -15,25 +16,37 @@ const Index = () => {
   const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>([]);
   const [liveRestaurants, setLiveRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [featured, live] = await Promise.all([
-          RestaurantService.getFeaturedRestaurants(),
-          RestaurantService.getLiveRestaurants()
-        ]);
+        const featured = await RestaurantService.getFeaturedRestaurants();
         setFeaturedRestaurants(featured);
-        setLiveRestaurants(live);
+        // Fetch all live restaurants from live-streaming API and take top 3
+        const allLive = await LiveStreamService.getLiveRestaurants();
+        const normalized = allLive.map(r => ({
+          ...r,
+          id: r.restaurantId || r.id
+        }));
+        setLiveRestaurants(normalized.slice(0, 3));
       } catch (error) {
+        setLiveRestaurants([]);
         console.error('Error loading data:', error);
       } finally {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/restaurants?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,10 +81,17 @@ const Index = () => {
           </div>
           
           <div className="max-w-md mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-              <Input placeholder="Search restaurants or cuisines..." className="pl-12 h-12 text-foreground" />
-            </div>
+            <form onSubmit={handleSearch}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Input
+                  placeholder="Search restaurants or cuisines..."
+                  className="pl-12 h-12 text-foreground"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </form>
           </div>
           
           <div className="flex justify-center gap-4">

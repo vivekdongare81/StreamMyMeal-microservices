@@ -11,6 +11,11 @@ public class FallbackController {
         return ResponseEntity.ok("Restaurant Service is currently unavailable. Please try again later.");
     }
 
+    @GetMapping("/fallback/live-streaming")
+    public ResponseEntity<String> liveStreamingFallback() {
+        return ResponseEntity.ok("Live Streaming Service is currently unavailable. Please try again later.");
+    }
+
     @GetMapping("/fallback/order")
     public ResponseEntity<String> orderFallback() {
         return ResponseEntity.ok("Order Service is currently unavailable. Please try again later.");

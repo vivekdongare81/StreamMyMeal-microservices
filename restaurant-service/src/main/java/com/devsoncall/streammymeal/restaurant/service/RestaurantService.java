@@ -4,7 +4,6 @@ import com.devsoncall.streammymeal.restaurant.dto.RestaurantDTO;
 import com.devsoncall.streammymeal.restaurant.entity.Restaurant;
 import com.devsoncall.streammymeal.restaurant.exception.RestaurantNotFoundException;
 import com.devsoncall.streammymeal.restaurant.repository.RestaurantRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,11 +11,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
+import com.devsoncall.streammymeal.restaurant.client.LiveSessionClient;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +27,14 @@ import java.util.Optional;
 public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final FileStorageService fileStorageService;
+    private final RestTemplate restTemplate;
+    private final LiveSessionClient liveSessionClient;
 
     @Value("${app.base-url}")
     private String baseUrl;
+
+    @Value("${live-streaming.service.url:http://localhost:8086}")
+    private String liveStreamingServiceUrl;
 
     public RestaurantDTO createRestaurant(RestaurantDTO restaurantDTO) {
         Restaurant restaurant = new Restaurant(
@@ -36,6 +44,16 @@ public class RestaurantService {
                 restaurantDTO.image()
         );
         restaurantRepository.save(restaurant);
+        
+        // Create a live session for the new restaurant using Feign client
+        try {
+            liveSessionClient.createSessionForNewRestaurant(restaurant.getRestaurantId());
+            log.info("Created live session for restaurant: {}", restaurant.getRestaurantId());
+        } catch (Exception e) {
+            log.warn("Failed to create live session for restaurant {}: {}", restaurant.getRestaurantId(), e.getMessage());
+            // Don't fail the restaurant creation if live session creation fails
+        }
+        
         return toDTO(restaurant);
     }
 
@@ -97,6 +115,13 @@ public class RestaurantService {
     }
 
     public void deleteRestaurantById(Integer restaurantId) {
+        // First, delete live sessions for this restaurant
+        try {
+            liveSessionClient.deleteSessionsByRestaurant(restaurantId);
+            log.info("Deleted live sessions for restaurant {}", restaurantId);
+        } catch (Exception e) {
+            log.warn("Failed to delete live sessions for restaurant {}: {}", restaurantId, e.getMessage());
+        }
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
         restaurantRepository.delete(restaurant);

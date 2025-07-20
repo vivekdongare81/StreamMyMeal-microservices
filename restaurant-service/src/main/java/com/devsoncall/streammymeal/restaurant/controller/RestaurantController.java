@@ -40,6 +40,7 @@ public class RestaurantController {
     private final FileStorageService imageService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestaurantDTO> createRestaurant(@RequestBody RestaurantDTO restaurantDTO) {
         RestaurantDTO createdRestaurant = restaurantService.createRestaurant(restaurantDTO);
         return new ResponseEntity<>(createdRestaurant ,HttpStatus.CREATED);
@@ -68,6 +69,7 @@ public class RestaurantController {
     }
 
     @PostMapping("/{restaurantId}/upload-image")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RestaurantDTO> uploadImage(
             @PathVariable Integer restaurantId,
             @RequestParam("file") MultipartFile file) {
@@ -82,7 +84,7 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{restaurantId}")
-    // @PreAuthorize("hasRole('ADMIN')")// not needed , handles in security config
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRestaurant(@PathVariable Integer restaurantId) {
         try {
             restaurantService.deleteRestaurantById(restaurantId);

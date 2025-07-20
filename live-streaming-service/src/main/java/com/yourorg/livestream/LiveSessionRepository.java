@@ -5,7 +5,8 @@ import java.util.Optional;
 import java.util.List;
 
 public interface LiveSessionRepository extends JpaRepository<LiveSession, Long> {
-    Optional<LiveSession> findByRestaurantId(String restaurantId);
-    Optional<LiveSession> findByRoomId(String roomId);
+    Optional<LiveSession> findByRestaurantId(Integer restaurantId);
+    Optional<LiveSession> findByBroadcastId(String broadcastId);
     List<LiveSession> findByIsLiveTrue();
+    List<LiveSession> findByRestaurantIdOrderByStartedAtDesc(Integer restaurantId);
 } 
