@@ -17,7 +17,7 @@ const AdminPanel = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 8;
 
   const loadRestaurants = async (pageNum = 0) => {
     try {
@@ -111,9 +111,19 @@ const AdminPanel = () => {
       setRestaurants(prev => prev.filter(r => r.id !== restaurantId));
       toast.success('Restaurant deleted successfully!');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to delete restaurant');
+      if (
+        err.message &&
+        (err.message.includes("Default restaurants cannot be deleted") || err.message.includes("Access forbidden"))
+      ) {
+        toast.error("Default 10 restaurants cannot be deleted. You can only delete your own restaurants.");
+      } else {
+        toast.error(err.message || 'Failed to delete restaurant');
+      }
     }
   };
+
+  // Helper to determine if a restaurant is a default (top 10)
+  const isDefaultRestaurant = (index: number) => index < 10;
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,12 +165,16 @@ const AdminPanel = () => {
               </tr>
             </thead>
             <tbody>
-              {restaurants.map(r => (
+              {restaurants.map((r, index) => (
                 <tr key={r.id}>
                   <td className="border px-4 py-2">{r.name}</td>
                   <td className="border px-4 py-2">{r.id}</td>
                   <td className="border px-4 py-2">
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteRestaurant(r.id)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteRestaurant(r.id)}
+                    >
                       Delete
                     </Button>
                   </td>

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { RestaurantService, Restaurant } from "@/services";
+import { LiveStreamService } from "@/services/liveStreamService";
 import { restaurantsData as dummyRestaurants } from '../data/restaurants';
 
 const PAGE_SIZE = 15;
@@ -17,24 +18,41 @@ const RestaurantList = () => {
   const [selectedCuisine, setSelectedCuisine] = useState("All");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [liveRestaurants, setLiveRestaurants] = useState([]);
 
   const cuisines = ["All", "Indian", "Italian", "Chinese","Japanese", "American", "Thai"];
 
-  const loadRestaurants = async () => {
+    const loadRestaurants = async () => {
     setLoading(true);
     try {
       const data = await RestaurantService.getRestaurants();
       setRestaurants(data);
-    } catch (error) {
+      } catch (error) {
       setRestaurants([]);
-      console.error('Error loading restaurants:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        console.error('Error loading restaurants:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     loadRestaurants();
+  }, []);
+
+  useEffect(() => {
+    const fetchLiveRestaurants = async () => {
+      try {
+        const allLive = await LiveStreamService.getLiveRestaurants();
+        const normalized = allLive.map(r => ({
+          ...r,
+          id: r.restaurantId || r.id
+        }));
+        setLiveRestaurants(normalized);
+      } catch (error) {
+        setLiveRestaurants([]);
+      }
+    };
+    fetchLiveRestaurants();
   }, []);
 
   // Filter restaurants by search term and cuisine
@@ -97,7 +115,7 @@ const RestaurantList = () => {
           <h2 className="text-2xl font-bold mb-2">Live Cooking Sessions</h2>
           <p className="mb-4">Watch your favorite chefs cook live and order the same dish!</p>
           <div className="flex gap-4 overflow-x-auto">
-            {restaurants.filter(r => r.isLive).map((restaurant) => (
+            {liveRestaurants.map((restaurant) => (
               <Link
                 key={restaurant.id}
                 to={`/live/${restaurant.id}`}
@@ -131,8 +149,8 @@ const RestaurantList = () => {
             ))
           ) : (
             filteredRestaurants.map((restaurant) => (
-              (() => { console.log('[DEBUG] RestaurantList id:', restaurant.id); return null; })(),
-              <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
+              // (() => { console.log('[DEBUG] RestaurantList id:', restaurant.id); return null; })(),
+            <Card key={restaurant.id} className="overflow-hidden hover:shadow-medium transition-shadow">
               <div className="relative">
                 <img
                   src={restaurant.image}

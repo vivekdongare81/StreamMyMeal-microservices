@@ -47,8 +47,7 @@ const mockMessages: ChatMessage[] = [
 ];
 
 const LiveStreaming = () => {
-  // Remove useParams and all API/dynamic loading
-  // const { restaurantId } = useParams();
+  const { restaurantId } = useParams();
   const [isPlaying, setIsPlaying] = useState(true);
   const [previewStream, setPreviewStream] = useState<LiveStream | null>(null);
   const [otherStreams, setOtherStreams] = useState<LiveStream[]>([]);
@@ -58,15 +57,10 @@ const LiveStreaming = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchLiveRestaurants();
-  }, []);
-
-  const fetchLiveRestaurants = async () => {
-    try {
+    const fetchLiveRestaurants = async () => {
       setLoading(true);
-      const liveRestaurants = await LiveStreamService.getLiveRestaurants();
-      
-      if (liveRestaurants.length > 0) {
+      try {
+        const liveRestaurants = await LiveStreamService.getLiveRestaurants();
         // Convert LiveRestaurant to LiveStream format for the UI
         const convertedStreams: LiveStream[] = liveRestaurants.map(restaurant => ({
           id: restaurant.liveSession.broadcastId,
@@ -75,39 +69,41 @@ const LiveStreaming = () => {
           viewers: restaurant.liveSession.viewersCount,
           viewersCount: restaurant.liveSession.viewersCount,
           isLive: restaurant.liveSession.isLive,
-          image: restaurant.image, // Use backend image
-          streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Set dummy video URL
+          image: restaurant.image,
+          streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
           chatMessages: [
             { id: "1", user: "FoodLover123", message: "Looks amazing! 😍", timestamp: new Date() },
             { id: "2", user: "Chef_Fan", message: "What spices are you using?", timestamp: new Date() },
             { id: "3", user: "Hungry_User", message: "Can't wait to order this!", timestamp: new Date() }
           ]
         }));
-
-        setPreviewStream(convertedStreams[0]);
-        setOtherStreams(convertedStreams.slice(1));
-        setError(null);
-      } else {
-        // Fallback to dummy data if no backend streams
-        const streams = Object.values(liveStreamsData);
-        if (streams.length > 0) {
-          setPreviewStream(streams[0]);
-          setOtherStreams(streams.slice(1));
+        let stream: LiveStream | undefined;
+        if (restaurantId) {
+          stream = convertedStreams.find(
+            r => String(r.restaurantId) === String(restaurantId)
+          );
+        } else {
+          stream = convertedStreams[0]; // Pick the first live stream as default
         }
+        if (stream) {
+          setPreviewStream(stream);
+        } else {
+          setPreviewStream(null);
+        }
+        setOtherStreams(convertedStreams.filter(
+          r => stream ? String(r.restaurantId) !== String(stream!.restaurantId) : true
+        ));
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch live restaurants');
+        setPreviewStream(null);
+        setOtherStreams([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Failed to fetch live restaurants');
-      console.error('Error:', err);
-      // Fallback to dummy data on error
-      const streams = Object.values(liveStreamsData);
-      if (streams.length > 0) {
-        setPreviewStream(streams[0]);
-        setOtherStreams(streams.slice(1));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    fetchLiveRestaurants();
+  }, [restaurantId]);
 
   const handleCardClick = (stream: LiveStream) => {
     if (!previewStream) return;
@@ -132,7 +128,7 @@ const LiveStreaming = () => {
       if (videoRef.current) {
         videoRef.current.load();
         videoRef.current.play().catch(() => {
-          console.log('Video autoplay prevented');
+          // console.log('Video autoplay prevented');
         });
       }
     }, 100);
@@ -167,7 +163,7 @@ const LiveStreaming = () => {
         <div className="text-center py-8">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
-            onClick={fetchLiveRestaurants}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Retry
@@ -258,6 +254,16 @@ const LiveStreaming = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h1 className="text-2xl font-bold mb-2">{previewStream?.title || "Live Cooking Session"}</h1>
+                    {previewStream && (
+                      <button
+                        className="mt-2 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-semibold"
+                        onClick={() => {
+                          window.location.href = `/menu/${previewStream.restaurantId}`;
+                        }}
+                      >
+                        Order Now
+                      </button>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <Badge variant="secondary" className="bg-black/50 text-white">

@@ -30,7 +30,7 @@ const Index = () => {
           ...r,
           id: r.restaurantId || r.id
         }));
-        setLiveRestaurants(normalized.slice(0, 3));
+        setLiveRestaurants(normalized);
       } catch (error) {
         setLiveRestaurants([]);
         console.error('Error loading data:', error);
@@ -82,15 +82,15 @@ const Index = () => {
           
           <div className="max-w-md mx-auto mb-8">
             <form onSubmit={handleSearch}>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   placeholder="Search restaurants or cuisines..."
                   className="pl-12 h-12 text-foreground"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
-              </div>
+            </div>
             </form>
           </div>
           
@@ -112,7 +112,7 @@ const Index = () => {
           <h2 className="text-2xl font-bold mb-2">Live Cooking Sessions</h2>
           <p className="mb-4">Watch your favorite chefs cook live and order the same dish!</p>
           <div className="flex gap-8 overflow-x-auto">
-            {restaurants.filter(r => r.isLive).map((restaurant) => (
+            {liveRestaurants.map((restaurant) => (
               <Link
                 key={restaurant.id}
                 to={`/live/${restaurant.id}`}

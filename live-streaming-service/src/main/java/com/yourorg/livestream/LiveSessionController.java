@@ -62,7 +62,7 @@ public class LiveSessionController {
             List<LiveSession> liveSessions = service.getAllLiveSessions();
             System.out.println("[DEBUG] liveSessions fetched: " + liveSessions.size());
             liveSessions.forEach(ls -> System.out.println("[DEBUG] LiveSession: " + ls));
-
+            
             List<Map<String, Object>> liveRestaurants = liveSessions.stream()
                 .map(session -> {
                     try {

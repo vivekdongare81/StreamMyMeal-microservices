@@ -37,12 +37,12 @@ public class RestaurantService {
     private String liveStreamingServiceUrl;
 
     public RestaurantDTO createRestaurant(RestaurantDTO restaurantDTO) {
-        Restaurant restaurant = new Restaurant(
-                restaurantDTO.restaurantId(),
-                restaurantDTO.name(),
-                restaurantDTO.address(),
-                restaurantDTO.image()
-        );
+        Restaurant restaurant = Restaurant.builder()
+        .restaurantId(restaurantDTO.restaurantId())
+        .name(restaurantDTO.name())
+        .address(restaurantDTO.address())
+        .image(restaurantDTO.image())
+        .build();
         restaurantRepository.save(restaurant);
         
         // Create a live session for the new restaurant using Feign client
@@ -115,6 +115,10 @@ public class RestaurantService {
     }
 
     public void deleteRestaurantById(Integer restaurantId) {
+        // Prevent deletion of default restaurants (IDs 1-10)
+        if (restaurantId != null && restaurantId >= 1 && restaurantId <= 10) {
+            throw new IllegalArgumentException("Default restaurants cannot be deleted. You can only delete your own restaurants.");
+        }
         // First, delete live sessions for this restaurant
         try {
             liveSessionClient.deleteSessionsByRestaurant(restaurantId);
