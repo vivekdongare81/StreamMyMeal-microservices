@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Users, ShoppingCart, Star, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,12 @@ import Navbar from "@/components/Navbar";
 import { RestaurantService, LiveStreamService, Restaurant, LiveStream, LiveRestaurant } from "@/services";
 import { restaurantsData } from "../data/restaurants";
 import { liveStreamsData } from '../data/liveStreams';
+import io from 'socket.io-client';
+
+const SFU_URL = 'http://localhost:4000';
+const socket = io(SFU_URL, { autoConnect: true });
+// @ts-ignore
+(window as any).socket = socket; // for manual testing in browser console
 
 interface LiveStreamData {
   id: string;
@@ -46,25 +52,6 @@ const mockMessages: ChatMessage[] = [
   { id: "4", username: "Hungry_Soul", message: "Can you show the spice mix again?", timestamp: "7 min ago" },
 ];
 
-// Custom hook to poll live viewer count
-function useLiveViewerCount(broadcastId: string | undefined) {
-  const [viewerCount, setViewerCount] = useState(0);
-  useEffect(() => {
-    if (!broadcastId) return;
-    let interval = setInterval(async () => {
-      try {
-        const res = await fetch(`http://localhost:4000/api/broadcast/${broadcastId}/viewers`);
-        const data = await res.json();
-        setViewerCount(data.viewers);
-      } catch {
-        setViewerCount(0);
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [broadcastId]);
-  return viewerCount;
-}
-
 const LiveStreaming = () => {
   const { restaurantId } = useParams();
   const [isPlaying, setIsPlaying] = useState(true);
@@ -77,6 +64,32 @@ const LiveStreaming = () => {
   const [showLiveViewer, setShowLiveViewer] = useState(false);
   const [isBroadcastLive, setIsBroadcastLive] = useState(false);
   const [viewerCount, setViewerCount] = useState(0);
+
+  // Add a useEffect to poll viewer count via socket.io
+  useEffect(() => {
+    if (!previewStream?.id) return;
+
+    const emitViewerCount = () => {
+      socket.emit('get-viewer-count', previewStream.id, (count) => {
+        console.log('Live viewers for', previewStream.id, ':', count);
+        setViewerCount(count);
+      });
+    };
+
+    // Poll every 3 seconds
+    const interval = setInterval(() => {
+      if (socket.connected) emitViewerCount();
+    }, 3000);
+
+    // Fetch immediately on mount
+    if (socket.connected) emitViewerCount();
+    else socket.once('connect', emitViewerCount);
+
+    return () => {
+      clearInterval(interval);
+      socket.off('connect', emitViewerCount);
+    };
+  }, [previewStream?.id]);
 
   useEffect(() => {
     const fetchLiveRestaurants = async () => {
@@ -126,6 +139,35 @@ const LiveStreaming = () => {
     };
     fetchLiveRestaurants();
   }, [restaurantId]);
+  
+// Main func after relaod
+  useEffect(() => {
+    if (!previewStream?.id) return;
+
+    const emitCheck = () => {
+      socket.emit('check-broadcast-exists', previewStream.id, (exists) => {
+        console.log("Socket callback fired for", previewStream.id, "exists:", exists);
+        if (exists) {
+          setIsBroadcastLive(true);
+          console.log(`Broadcast exists for broadcastId: ${previewStream.id}`);
+        } else {
+          setIsBroadcastLive(false);
+          console.log(`Broadcast not exist for broadcastId: ${previewStream.id}`);
+        }
+      });
+    };
+
+    if (socket.connected) {
+      emitCheck();
+    } else {
+      socket.once('connect', emitCheck);
+    }
+
+    // Cleanup: remove listener if component unmounts before connect
+    return () => {
+      socket.off('connect', emitCheck);
+    };
+  }, [previewStream?.id]);
 
   const handleBroadcastClick = () => {
     if (previewStream?.id) {

@@ -33,32 +33,51 @@ function logAllLiveBroadcasts() {
   console.log(`[SFU] Total live rooms: ${liveBroadcasts.length}`);
 }
 
-app.get('/api/broadcast/:broadcastId/viewers', (req, res) => {
-  const { broadcastId } = req.params;
-  const room = rooms[broadcastId];
-  let viewerCount = 0;
-  if (room && room.peers) {
-    // Count peers with role 'viewer'
-    viewerCount = Object.values(room.peers).filter(peer => peer.role === 'viewer').length;
-  }
-  res.json({ viewers: viewerCount });
-});
 
-app.get('/api/broadcast/:broadcastId/live', (req, res) => {
-  const { broadcastId } = req.params;
-  const room = rooms[broadcastId];
-  let isLive = false;
-  if (room && room.peers) {
-    // Check if any peer in the room is a broadcaster
-    isLive = Object.values(room.peers).some(peer => peer.role === 'broadcaster');
-  }
-  res.json({ live: isLive });
-});
+function getLiveViewerCount(room) {
+  if (!room || !room.peers) return 0;
+  // Count all peers except the broadcaster
+  const totalPeers = Object.keys(room.peers).length;
+  const broadcasterCount = Object.values(room.peers).filter(peer => peer.role === 'broadcaster').length;
+  return Math.max(0, totalPeers - broadcasterCount);
+}
+
+function doesRoomExist(roomId) {
+  return !!rooms[roomId];
+}
+
+// app.get('/api/broadcast/:broadcastId/exists', (req, res) => {
+//   const { broadcastId } = req.params;
+//   const exists = doesRoomExist(broadcastId);
+//   res.json({ exists });
+// });
+
+// app.get('/api/broadcast/:broadcastId/viewers', (req, res) => {
+//   const { broadcastId } = req.params;
+//   const room = rooms[broadcastId];
+//   const viewerCount = getLiveViewerCount(room);
+//   res.json({ viewers: viewerCount });
+// });
 
 io.on('connection', socket => {
   let currentRoomId = null;
   let peerId = uuidv4();
   let room = null;
+
+  // WebSocket: Check if a broadcast exists
+  socket.on('check-broadcast-exists', (broadcastId, cb) => {
+    const exists = doesRoomExist(broadcastId);
+    console.log(`[SFU] check-broadcast-exists called for broadcastId: ${broadcastId}, exists: ${exists}`);
+    cb(exists);
+  });
+
+  // WebSocket: Get viewer count for a broadcast
+  socket.on('get-viewer-count', (broadcastId, cb) => {
+    const room = rooms[broadcastId];
+    const viewerCount = getLiveViewerCount(room);
+    console.log(`[SFU] get-viewer-count for broadcastId: ${broadcastId}, viewers: ${viewerCount}`);
+    cb(viewerCount);
+  });
 
   socket.on('join-room', async ({ roomId, role }, cb) => {
     currentRoomId = roomId;
@@ -84,6 +103,16 @@ io.on('connection', socket => {
       console.log(`[SFU] Created new room: ${roomId}`);
     }
     room = rooms[roomId];
+
+    // ENFORCE ONE BROADCASTER PER ROOM
+    if (role === 'broadcaster') {
+      const hasBroadcaster = Object.values(room.peers).some(peer => peer.role === 'broadcaster');
+      if (hasBroadcaster) {
+        socket.emit('error', 'A broadcaster is already live for this Restaurant.');
+        return;
+      }
+    }
+
     room.peers[peerId] = { transports: [], producers: [], consumers: [], socket, role };
     socket.emit('peer-id', peerId);
     console.log(`[SFU] Peer ${peerId} joined room ${roomId}`);
@@ -92,22 +121,22 @@ io.on('connection', socket => {
     if (role === 'broadcaster') {
       logAllLiveBroadcasts();
     }
-    // Inform the new peer about all existing producers in this room
-    // for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
-    //   if (otherPeerId !== peerId) {
-    //     for (const producer of otherPeer.producers) {
-    //       socket.emit('new-producer', { producerId: producer.id, kind: producer.kind });
-    //     }
-    //   }
-    // }
-    // // Notify all broadcasters in the room that a new viewer joined
-    // if (role === 'viewer') {
-    //   for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
-    //     if (otherPeer.role === 'broadcaster') {
-    //       otherPeer.socket.emit('new-viewer', { viewerId: peerId });
-    //     }
-    //   }
-    // }
+   // Inform the new peer about all existing producers in this room
+    for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
+      if (otherPeerId !== peerId) {
+        for (const producer of otherPeer.producers) {
+          socket.emit('new-producer', { producerId: producer.id, kind: producer.kind });
+        }
+      }
+    }
+    // Notify all broadcasters in the room that a new viewer joined
+    if (role === 'viewer') {
+      for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
+        if (otherPeer.role === 'broadcaster') {
+          otherPeer.socket.emit('new-viewer', { viewerId: peerId });
+        }
+      }
+    }
     if (cb) cb();
   });
 
@@ -218,14 +247,32 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     if (room && room.peers[peerId]) {
+      const isBroadcaster = room.peers[peerId].role === 'broadcaster';
+
+      // Remove the disconnecting peer
       room.peers[peerId].producers.forEach(p => p.close());
       room.peers[peerId].consumers.forEach(c => c.close());
       room.peers[peerId].transports.forEach(t => t.close());
       delete room.peers[peerId];
-      // If room is empty, delete it
-      if (Object.keys(room.peers).length === 0) {
+
+      if (isBroadcaster) {
+        // If broadcaster left, close all remaining peers and delete the room
+        for (const otherPeerId in room.peers) {
+          room.peers[otherPeerId].producers.forEach(p => p.close());
+          room.peers[otherPeerId].consumers.forEach(c => c.close());
+          room.peers[otherPeerId].transports.forEach(t => t.close());
+          // Optionally, notify viewers that the broadcast ended
+          room.peers[otherPeerId].socket.emit('error', 'Broadcast has ended.');
+          delete room.peers[otherPeerId];
+        }
         delete rooms[currentRoomId];
-        console.log(`[SFU] Deleted empty room: ${currentRoomId}`);
+        console.log(`[SFU] Deleted room because broadcaster left: ${currentRoomId}`);
+      } else {
+        // If only a viewer left, keep the room if broadcaster is still present
+        if (Object.keys(room.peers).length === 0) {
+          delete rooms[currentRoomId];
+          console.log(`[SFU] Deleted empty room: ${currentRoomId}`);
+        }
       }
       console.log(`[SFU] Peer disconnected: ${peerId} from room ${currentRoomId}`);
       logAllLiveBroadcasts();
