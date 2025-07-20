@@ -2,7 +2,7 @@
 
 A scalable, event-driven food delivery and live streaming platform built with **Java 17, Spring Boot microservices, PostgreSQL, Kafka, Docker, React, mediasoup, and WebSocket (socket.io & STOMP)**.
 
-**Real-world use case:** StreamMyMeal helps restaurants build trust and transparency by broadcasting live cooking sessions from their kitchens. Customers watch chefs prepare food, see hygiene practices, and interact in real time addressing concerns about safety and authenticity. Users can discover, watch, and order food directly from live streams, with seamless order and payment management for an interactive, reassuring dining experience.
+**Real-world use case:** StreamMyMeal helps restaurants build trust and transparency by broadcasting live cooking sessions from their kitchens. Customers watch chefs prepare food, see hygiene practices, and interact in real time providing visible hygiene assurance and addressing concerns about safety and authenticity. Users can discover, watch, and order food directly from live streams, with seamless order and payment management for an interactive, reassuring dining experience.
 
 The system supports real-time broadcasts, live viewer stats, and robust order/payment management in a modern, cloud-ready architecture.
 
