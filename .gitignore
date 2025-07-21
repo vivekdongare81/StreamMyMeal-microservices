@@ -1,5 +1,6 @@
 # ====== Node.js / React / TypeScript / Next.js ======
 
+**/.env
 # Node modules
 node_modules/
 
