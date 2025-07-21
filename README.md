@@ -12,12 +12,13 @@ The system supports real-time broadcasts, live viewer stats, and robust order/pa
 - [Architecture Overview](#architecture-overview)
 - [Key Components](#key-components)
 - [Technologies Used](#technologies-used)
-- [Running the Project](#running-the-project)
 - [WebRTC Live Streaming (SFU)](#webrtc-live-streaming-sfu)
 - [Real-Time Features with WebSockets](#real-time-features-with-websockets)
 - [Microservices Breakdown](#microservices-breakdown)
 - [Code Structure](#code-structure)
-- [Interview Highlights](#interview-highlights)
+- [Running the Project](#running-the-project)
+- [Environment Setup Instructions (IMPORTANT)](#️-environment-setup-instructions-important)
+- [Contact & Contribution](#contact--contribution)
 
 ---
 
@@ -61,42 +62,6 @@ This project adopts a **microservices-based architecture** for modularity, scala
 
 ---
 
-## 🚦 Running the Project
-### Prerequisites
-- Java 17, Node.js 18+, PostgreSQL 16+, Kafka, Docker, Maven
-
-### Run All Microservices at Once (Recommended)
-Use the provided setup-local/docker-compose.yml for a full local environment:
-```bash
-cd setup-local
-# This will start PostgreSQL, Kafka, Redis, and all microservices
-docker-compose up -d
-```
-
-### Run Services Individually
-Each service can also be run independently:
-```bash
-cd <service-name>
-mvn clean install
-java -jar target/*.jar
-```
-
-### Frontend
-```bash
-cd frontend-app
-npm install
-npm start
-```
-
-### Live Streaming SFU Server
-```bash
-cd live-sfu-server
-npm install
-node server.js
-```
-
----
-
 ## 🎥 WebRTC Live Streaming (SFU)
 
 ### What is it?
@@ -125,16 +90,6 @@ A dedicated **SFU (Selective Forwarding Unit) server** using mediasoup enables s
   - Viewer count is updated instantly for all clients when someone joins/leaves a stream.
   - Broadcast existence is checked in real time before showing a stream.
 - **No polling required**: The backend emits events (`viewer-count-updated`) to all clients in a room, and the frontend updates the UI immediately.
-
-**Example event flow:**
-```mermaid
-graph TD;
-  A[Viewer joins] --> B(SFU updates room)
-  B --> C{Broadcast exists?}
-  C -- Yes --> D[Emit 'viewer-count-updated']
-  D --> E[Frontend updates viewer count]
-```
-
 ---
 
 ## 🧩 Microservices Breakdown
@@ -167,6 +122,42 @@ StreamMyMeal-microservices/
 ├── frontend-app/            # React frontend
 ├── setup-local/             # Docker Compose, config, init scripts
 └── README.md
+```
+
+---
+
+## 🚦 Running the Project
+### Prerequisites
+- Java 17, Node.js 18+, PostgreSQL 16+, Kafka, Docker, Maven
+
+### Run All Microservices at Once (Recommended)
+Use the provided setup-local/docker-compose.yml for a full local environment:
+```bash
+cd setup-local
+# This will start PostgreSQL, Kafka, Redis, and all microservices
+docker-compose up -d
+```
+
+### Run Services Individually
+Each service can also be run independently:
+```bash
+cd <service-name>
+mvn clean install
+java -jar target/*.jar
+```
+
+### Frontend
+```bash
+cd frontend-app
+npm install
+npm start
+```
+
+### Live Streaming SFU Server
+```bash
+cd live-sfu-server
+npm install
+node server.js
 ```
 
 ---
