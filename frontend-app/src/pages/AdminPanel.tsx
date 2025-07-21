@@ -117,7 +117,7 @@ const AdminPanel = () => {
       ) {
         toast.error("Default 10 restaurants cannot be deleted. You can only delete your own restaurants.");
       } else {
-        toast.error(err.message || 'Failed to delete restaurant');
+      toast.error(err.message || 'Failed to delete restaurant');
       }
     }
   };

@@ -160,7 +160,7 @@ export default function Viewer() {
           position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
           display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', background: 'rgba(0,0,0,0.7)'
         }}>
-          <div>
+    <div>
             <h2>No Live Stream</h2>
             <p>Waiting for broadcast to start...</p>
           </div>

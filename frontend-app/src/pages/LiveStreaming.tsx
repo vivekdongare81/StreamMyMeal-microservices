@@ -92,10 +92,10 @@ const LiveStreaming = () => {
   }, [previewStream?.id]);
 
   useEffect(() => {
-    const fetchLiveRestaurants = async () => {
+  const fetchLiveRestaurants = async () => {
       setLoading(true);
       try {
-        const liveRestaurants = await LiveStreamService.getLiveRestaurants();
+      const liveRestaurants = await LiveStreamService.getLiveRestaurants();
         // Convert LiveRestaurant to LiveStream format for the UI
         const convertedStreams: LiveStream[] = liveRestaurants.map(restaurant => ({
           id: restaurant.liveSession.broadcastId,
@@ -115,28 +115,28 @@ const LiveStreaming = () => {
         let stream: LiveStream | undefined;
         if (restaurantId) {
           stream = convertedStreams.find(
-            r => String(r.restaurantId) === String(restaurantId)
-          );
+          r => String(r.restaurantId) === String(restaurantId)
+        );
         } else {
           stream = convertedStreams[0]; // Pick the first live stream as default
         }
         if (stream) {
           setPreviewStream(stream);
-        } else {
+      } else {
           setPreviewStream(null);
         }
         setOtherStreams(convertedStreams.filter(
           r => stream ? String(r.restaurantId) !== String(stream!.restaurantId) : true
         ));
         setError(null);
-      } catch (err) {
-        setError('Failed to fetch live restaurants');
+    } catch (err) {
+      setError('Failed to fetch live restaurants');
         setPreviewStream(null);
         setOtherStreams([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
     fetchLiveRestaurants();
   }, [restaurantId]);
   
@@ -291,23 +291,23 @@ const LiveStreaming = () => {
                       }}
                     />
                   ) : (
-                    <video
-                      className="w-full h-full object-cover"
-                      autoPlay
-                      muted
-                      loop
+                  <video
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
                       src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                     />
                   )}
-                </div>
+                  </div>
                 {/* Live Badge */}
-                <div className="absolute top-4 left-4">
-                  <Badge className="bg-red-500 text-white animate-pulse">
-                    <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                  <div className="absolute top-4 left-4">
+                    <Badge className="bg-red-500 text-white animate-pulse">
+                      <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
                     {isBroadcastLive ? `${viewerCount} viewers` : 'Demo'}
-                  </Badge>
-                </div>
+                    </Badge>
+                  </div>
                 {/* Stream Stats */}
                 <div className="absolute top-4 right-4 flex gap-2">
                    <span className="bg-black/50 text-white px-3 py-1 text-xs font-semibold">

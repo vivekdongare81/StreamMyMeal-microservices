@@ -171,6 +171,41 @@ StreamMyMeal-microservices/
 
 ---
 
+## ⚠️ Environment Setup Instructions (IMPORTANT)
+
+### 1. Set Up `.env` Files **Before Starting Any Service**
+
+- **Backend:**
+  - Each backend service (user, restaurant, order, SFU, etc.) requires its own `.env` file in setup-local directory.
+  - Do **not** commit secrets to git. Store sensitive values securely.
+- **Frontend:**
+  - The frontend (React/Vite) requires a `.env` file in the `frontend-app/` directory.
+  - All variables must be prefixed with `VITE_` (e.g., `VITE_API_URL`, `VITE_SFU_URL`).
+
+### 2. ⚠️ **SFU Server IP Configuration for WebRTC**
+
+- **You MUST update the `announcedIp` in your SFU server config to match the IP of the machine where you are hosting the SFU server.**
+- If you do not set this correctly, WebRTC connections will fail for remote clients.
+- **Check your current IP before deploying:**
+  - For LAN: Use your machine’s LAN IP (e.g., `192.168.x.x`).
+  - For WAN/Cloud: Use your public IP (e.g., `203.x.x.x`).
+
+### 3. Deployment Scenarios & SFU IP Setup
+
+- **If you are behind NAT or on a cloud server, use your public IP.**
+- **If you are on a local network, use your machine’s LAN IP (e.g., `192.168.x.x`).**
+- **If you are behind NAT (e.g., home WiFi), you may need to port-forward UDP/TCP ports from your router to your SFU server.**
+- **If you want to support users from outside your network (WAN), use your public IP and make sure your firewall/router allows the necessary ports.**
+- **If you only want LAN access, use your LAN IP as `announcedIp`.**
+
+**Example SFU config:**
+```js
+listenIps: [{ ip: '0.0.0.0', announcedIp: 'YOUR_IP_HERE' }]
+```
+- Replace `YOUR_IP_HERE` with your actual LAN or public IP as appropriate.
+
+---
+
 ## 📞 Contact & Contribution
 For questions, suggestions, or contributions, please open an issue or pull request.
 

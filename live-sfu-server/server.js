@@ -121,7 +121,7 @@ io.on('connection', socket => {
     if (role === 'broadcaster') {
       logAllLiveBroadcasts();
     }
-   // Inform the new peer about all existing producers in this room
+    // Inform the new peer about all existing producers in this room
     for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
       if (otherPeerId !== peerId) {
         for (const producer of otherPeer.producers) {
@@ -206,34 +206,52 @@ io.on('connection', socket => {
   });
 
   socket.on('consume', async ({ transportId, producerId, rtpCapabilities }, cb) => {
-    if (!room) return cb({ error: 'Not in a room' });
-    if (!room.router.canConsume({ producerId, rtpCapabilities })) {
-      return cb({ error: 'Cannot consume' });
-    }
-    const transport = room.peers[peerId].transports.find(t => t.id === transportId);
-    const consumer = await transport.consume({
-      producerId,
-      rtpCapabilities,
-      paused: false
-    });
-    room.peers[peerId].consumers.push(consumer);
-    cb({
-      id: consumer.id,
-      producerId,
-      kind: consumer.kind,
-      rtpParameters: consumer.rtpParameters
-    });
-    // Find the producer's peer and notify them
-    for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
-      if (otherPeer.producers.some(p => p.id === producerId)) {
-        otherPeer.socket.emit('new-consumer', { consumerId: consumer.id, peerId });
+    try {
+      if (!room) return cb({ error: 'Not in a room' });
+      if (!room.router.canConsume({ producerId, rtpCapabilities })) {
+        return cb({ error: 'Cannot consume' });
       }
-    }
-    consumer.on('trace', trace => {
-      if (trace.type === 'rtp') {
-        console.log(`[SFU] RTP packet for consumer ${consumer.id} (kind: ${consumer.kind})`);
+      const transport = room.peers[peerId].transports.find(t => t.id === transportId);
+      if (!transport) {
+        console.error(`[SFU] No transport found for peer ${peerId} with transportId ${transportId}`);
+        return cb({ error: 'No transport found for consuming' });
       }
-    });
+      let consumer;
+      try {
+        consumer = await transport.consume({
+          producerId,
+          rtpCapabilities,
+          paused: false
+        });
+      } catch (err) {
+        console.error(`[SFU] Error consuming for peer ${peerId}:`, err);
+        return cb({ error: 'Failed to consume: ' + (err && err.message ? err.message : err) });
+      }
+      if (!consumer) {
+        return cb({ error: 'Consumer could not be created' });
+      }
+      room.peers[peerId].consumers.push(consumer);
+      cb({
+        id: consumer.id,
+        producerId,
+        kind: consumer.kind,
+        rtpParameters: consumer.rtpParameters
+      });
+      // Find the producer's peer and notify them
+      for (const [otherPeerId, otherPeer] of Object.entries(room.peers)) {
+        if (otherPeer.producers.some(p => p.id === producerId)) {
+          otherPeer.socket.emit('new-consumer', { consumerId: consumer.id, peerId });
+        }
+      }
+      consumer.on('trace', trace => {
+        if (trace.type === 'rtp') {
+          console.log(`[SFU] RTP packet for consumer ${consumer.id} (kind: ${consumer.kind})`);
+        }
+      });
+    } catch (err) {
+      console.error(`[SFU] Unexpected error in consume handler for peer ${peerId}:`, err);
+      if (cb) cb({ error: 'Internal server error in consume handler' });
+    }
   });
 
   socket.on('resume-consumer', async ({ consumerId }) => {
@@ -269,9 +287,9 @@ io.on('connection', socket => {
         console.log(`[SFU] Deleted room because broadcaster left: ${currentRoomId}`);
       } else {
         // If only a viewer left, keep the room if broadcaster is still present
-        if (Object.keys(room.peers).length === 0) {
-          delete rooms[currentRoomId];
-          console.log(`[SFU] Deleted empty room: ${currentRoomId}`);
+      if (Object.keys(room.peers).length === 0) {
+        delete rooms[currentRoomId];
+        console.log(`[SFU] Deleted empty room: ${currentRoomId}`);
         }
       }
       console.log(`[SFU] Peer disconnected: ${peerId} from room ${currentRoomId}`);
