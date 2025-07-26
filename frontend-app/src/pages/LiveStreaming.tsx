@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Users, ShoppingCart, Star, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +54,7 @@ const mockMessages: ChatMessage[] = [
 
 const LiveStreaming = () => {
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(true);
   const [previewStream, setPreviewStream] = useState<LiveStream | null>(null);
   const [otherStreams, setOtherStreams] = useState<LiveStream[]>([]);
@@ -92,10 +93,10 @@ const LiveStreaming = () => {
   }, [previewStream?.id]);
 
   useEffect(() => {
-  const fetchLiveRestaurants = async () => {
+    const fetchLiveRestaurants = async () => {
       setLoading(true);
       try {
-      const liveRestaurants = await LiveStreamService.getLiveRestaurants();
+        const liveRestaurants = await LiveStreamService.getLiveRestaurants();
         // Convert LiveRestaurant to LiveStream format for the UI
         const convertedStreams: LiveStream[] = liveRestaurants.map(restaurant => ({
           id: restaurant.liveSession.broadcastId,
@@ -105,40 +106,57 @@ const LiveStreaming = () => {
           viewersCount: restaurant.liveSession.viewersCount,
           isLive: restaurant.liveSession.isLive,
           image: restaurant.image,
-          streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          streamUrl: `http://localhost:8080/hls/${restaurant.liveSession.broadcastId}.m3u8`,
           chatMessages: [
             { id: "1", user: "FoodLover123", message: "Looks amazing! 😍", timestamp: new Date() },
             { id: "2", user: "Chef_Fan", message: "What spices are you using?", timestamp: new Date() },
             { id: "3", user: "Hungry_User", message: "Can't wait to order this!", timestamp: new Date() }
           ]
         }));
-        let stream: LiveStream | undefined;
-        if (restaurantId) {
-          stream = convertedStreams.find(
-          r => String(r.restaurantId) === String(restaurantId)
-        );
-        } else {
-          stream = convertedStreams[0]; // Pick the first live stream as default
-        }
-        if (stream) {
-          setPreviewStream(stream);
-      } else {
+
+        // If there are no streams, set loading to false and return
+        if (convertedStreams.length === 0) {
           setPreviewStream(null);
+          setOtherStreams([]);
+          setError('No live streams available');
+          return;
         }
-        setOtherStreams(convertedStreams.filter(
-          r => stream ? String(r.restaurantId) !== String(stream!.restaurantId) : true
-        ));
+
+        // If there's a restaurantId in the URL, try to find that stream
+        if (restaurantId) {
+          const selectedStream = convertedStreams.find(
+            r => String(r.restaurantId) === String(restaurantId)
+          );
+          
+          if (selectedStream) {
+            setPreviewStream(selectedStream);
+            setOtherStreams(convertedStreams.filter(s => s.id !== selectedStream.id));
+          } else {
+            // If the stream in the URL is not found, default to the first stream
+            navigate(`/live/${convertedStreams[0].restaurantId}`, { replace: true });
+            setPreviewStream(convertedStreams[0]);
+            setOtherStreams(convertedStreams.slice(1));
+          }
+        } else {
+          // If no restaurantId in URL, use the first stream and update the URL
+          navigate(`/live/${convertedStreams[0].restaurantId}`, { replace: true });
+          setPreviewStream(convertedStreams[0]);
+          setOtherStreams(convertedStreams.slice(1));
+        }
+        
         setError(null);
-    } catch (err) {
-      setError('Failed to fetch live restaurants');
+      } catch (err) {
+        console.error('Error fetching live restaurants:', err);
+        setError('Failed to fetch live restaurants. Please try again later.');
         setPreviewStream(null);
         setOtherStreams([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchLiveRestaurants();
-  }, [restaurantId]);
+  }, [restaurantId, navigate]);
   
 // Main func after relaod
   useEffect(() => {
@@ -178,13 +196,17 @@ const LiveStreaming = () => {
 
   const handleCardClick = (stream: LiveStream) => {
     if (!previewStream) return;
-    // Move current preview to cards, and clicked card to preview
-    setOtherStreams(prev => [previewStream!, ...prev.filter(s => s.id !== stream.id)]);
     
-    // Set the dummy video URL for the clicked stream and reset chat
+    // Update the URL to reflect the selected stream
+    navigate(`/live/${stream.restaurantId}`, { replace: true });
+    
+    // Move current preview to cards, and clicked card to preview
+    setOtherStreams(prev => [previewStream, ...prev.filter(s => s.id !== stream.id)]);
+    
+    // Set the video URL for the clicked stream and reset chat
     const streamWithVideo = {
       ...stream,
-      streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      streamUrl: `http://localhost:8080/hls/${stream.id}.m3u8`,
       chatMessages: [
         { id: "1", user: "FoodLover123", message: "Looks amazing! 😍", timestamp: new Date() },
         { id: "2", user: "Chef_Fan", message: "What spices are you using?", timestamp: new Date() },

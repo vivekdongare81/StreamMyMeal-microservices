@@ -1,0 +1,326 @@
+services:
+  ###################  Redis SERVICE ########################
+  redis:
+    image: redis
+    container_name: redis-ms
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stream-network
+      
+  ###################  Kafka service ########################
+  kafka:
+    image: docker.io/bitnami/kafka:3.9
+    container_name: kafka
+    ports:
+      - "29092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      # Kraft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    networks:
+      - stream-network
+      
+  ###################  Users DB SERVICE ########################
+  allinoneDB: 
+    container_name: allinoneDB
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: streammymeal
+    volumes:
+      - ./init-multiple-dbs.sql:/docker-entrypoint-initdb.d/init.sql
+      - allinoneDB_data:/var/lib/postgresql/data
+    networks:
+      - stream-network
+
+  ###################  Application Services ########################
+
+  # Eureka Discovery Service
+  discovery-service:
+    build:
+      context: ../discovery-service
+      dockerfile: Dockerfile
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    depends_on:
+      - redis
+      - allinoneDB
+    networks:
+      - stream-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+    networks:
+      - stream-network
+
+  # User Service
+  user-service:
+    build:
+      context: ../user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://allinoneDB:5432/streammymeal
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # JWT Configuration from .env
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPRING_JPA_SHOW_SQL: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8081:8081"
+    depends_on:
+      - discovery-service
+      - allinoneDB
+      - kafka
+    networks:
+      - stream-network
+
+  # Restaurant Service
+  restaurant-service:
+    build:
+      context: ../restaurant-service
+      dockerfile: Dockerfile
+    container_name: restaurant-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://allinoneDB:5432/streammymeal
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_BASE_URL: http://restaurant-service:8082
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8082:8082"
+    depends_on:
+      - discovery-service
+      - allinoneDB
+      - kafka
+    networks:
+      - stream-network
+
+  # Order Service
+  order-service:
+    build:
+      context: ../order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://allinoneDB:5432/streammymeal
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8083:8083"
+    depends_on:
+      - discovery-service
+      - allinoneDB
+      - kafka
+      - user-service
+      - restaurant-service
+    networks:
+      - stream-network
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ../payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    env_file: .env  #<---------------- Use .env for payment configs
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://allinoneDB:5432/streammymeal
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: 'true'
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8084:8084"
+    depends_on:
+      - discovery-service
+      - allinoneDB
+      - kafka
+    networks:
+      - stream-network
+
+  # NATS Server for messaging
+  nats:
+    image: nats:2.9
+    container_name: nats
+    command: [
+      "-js",  # Enable JetStream
+      "--http_port=8222"  # Enable monitoring
+    ]
+    ports:
+      - "4222:4222"  # NATS clients
+      - "8222:8222"  # HTTP monitoring
+    networks:
+      - stream-network
+
+  # etcd Service for Service Discovery
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: etcd
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - "2379:2379"
+    networks:
+      - stream-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # SFU Server (Public WebRTC Server)
+  sfu-server:
+    image: pionwebrtc/ion-sfu:latest
+    container_name: sfu-server
+    depends_on:
+      etcd:
+        condition: service_healthy
+    environment:
+      - GIN_MODE=release
+      - AUTH_REQUIRED=false
+      - CANDIDATE_IPS=${SFU_PUBLIC_IP:-0.0.0.0}
+      - CONFIG_FILE=/etc/sfu/config.toml
+    ports:
+      - "4000:4000"  # WebSocket and API
+      - "50000-50010:50000-50010/udp"  # WebRTC ports
+    volumes:
+      - ./sfu.toml:/etc/sfu/config.toml:ro
+    networks:
+      - stream-network
+
+  # Live Streaming Service
+  live-streaming-service:
+    build:
+      context: ../live-streaming-service
+      dockerfile: Dockerfile
+    container_name: live-streaming-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://allinoneDB:5432/streammymeal
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SFU_API_URL: http://sfu-server:4000/api/broadcasts/start
+    ports:
+      - "8085:8085"
+      - "1935:1935"  # RTMP
+      - "8000:8000"  # HLS
+    depends_on:
+      - discovery-service
+      - kafka
+      - allinoneDB
+      - sfu-server
+    networks:
+      - stream-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ../notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    env_file: .env  #<---------------- Use .env for Mail configs
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_REDIS_HOST: redis
+    ports:
+      - "8086:8086"
+    depends_on:
+      - discovery-service
+      - kafka
+      - redis
+    networks:
+      - stream-network
+
+  # Frontend Application
+  frontend-app:
+    build:
+      context: ../frontend-app
+      dockerfile: Dockerfile # Dockerfile.dev (for local development) / Dockerfile (for production)
+    container_name: frontend-app
+    ports:
+      - "3000:3000"
+    env_file: .env  #<---------------- Use .env for frontend configs
+    environment:
+      REACT_APP_API_URL: http://api-gateway:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - stream-network
+
+###################  Volumes ########################
+
+volumes: 
+  kafka_data:
+    driver: local
+  allinoneDB_data:
+    driver: local
+    
+###################  Networks ########################
+
+networks:
+  stream-network:
+    driver: bridge

@@ -1,0 +1,26 @@
+[global]
+addr = "0.0.0.0:4000"
+
+[webrtc.ice_servers]
+urls = ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]
+
+[webrtc.ice_lite]
+enabled = true
+
+[webrtc.udp_port_range]
+min = 50000
+max = 50010
+
+[etcd]
+addrs = ["etcd:2379"]
+
+[signal]
+[signal.websocket]
+enabled = true
+port = 4000
+
+[signal.jsonrpc]
+enabled = false
+
+[log]
+level = "info"

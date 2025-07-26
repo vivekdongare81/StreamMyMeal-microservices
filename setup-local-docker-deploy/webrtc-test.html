@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC SFU Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #localVideo, #remoteVideo { width: 100%; max-width: 400px; background: #000; }
+        .videos { display: flex; gap: 20px; margin: 20px 0; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>WebRTC SFU Test</h1>
+    <div class="videos">
+        <div>
+            <h3>Local Stream</h3>
+            <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+        <div>
+            <h3>Remote Stream</h3>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+    </div>
+    
+    <div>
+        <button id="startButton">Start Camera</button>
+        <button id="publishButton" disabled>Publish Stream</button>
+        <button id="subscribeButton" disabled>Subscribe</button>
+    </div>
+    
+    <div id="status" class="status">Status: Ready</div>
+    <div id="iceCandidates"></div>
+
+    <script>
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const startButton = document.getElementById('startButton');
+        const publishButton = document.getElementById('publishButton');
+        const subscribeButton = document.getElementById('subscribeButton');
+        const statusDiv = document.getElementById('status');
+        const iceCandidatesDiv = document.getElementById('iceCandidates');
+
+        let localStream;
+        let peerConnection;
+        const roomId = 'test-room';
+        const peerId = 'test-peer-' + Math.random().toString(36).substr(2, 9);
+        const wsUrl = 'ws://localhost:4000/signal';
+        let ws;
+
+        // Update status
+        function updateStatus(message, isError = false) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${isError ? 'error' : 'success'}`;
+            console.log(message);
+        }
+
+        // Connect to WebSocket
+        function connectWebSocket() {
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                updateStatus('Connected to SFU server');
+                joinRoom();
+            };
+
+            ws.onmessage = async (event) => {
+                const message = JSON.parse(event.data);
+                console.log('Message from server:', message);
+
+                if (message.type === 'offer') {
+                    await handleOffer(message);
+                } else if (message.type === 'answer') {
+                    await handleAnswer(message);
+                } else if (message.type === 'candidate') {
+                    await handleCandidate(message);
+                }
+            };
+
+            ws.onerror = (error) => {
+                updateStatus('WebSocket error: ' + error.message, true);
+            };
+
+            ws.onclose = () => {
+                updateStatus('Disconnected from server', true);
+            };
+        }
+
+        // Join room
+        function joinRoom() {
+            ws.send(JSON.stringify({
+                type: 'join',
+                room: roomId,
+                peer: peerId
+            }));
+        }
+
+        // Start camera
+        startButton.onclick = async () => {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                localVideo.srcObject = localStream;
+                updateStatus('Camera access granted');
+                publishButton.disabled = false;
+                subscribeButton.disabled = false;
+            } catch (error) {
+                updateStatus('Error accessing camera: ' + error.message, true);
+            }
+        };
+
+        // Publish stream
+        publishButton.onclick = async () => {
+            if (!localStream) {
+                updateStatus('No local stream available', true);
+                return;
+            }
+
+            try {
+                const offer = await createPeerConnection('publish');
+                ws.send(JSON.stringify({
+                    type: 'publish',
+                    room: roomId,
+                    peer: peerId,
+                    sdp: offer
+                }));
+                updateStatus('Publishing stream...');
+            } catch (error) {
+                updateStatus('Error publishing stream: ' + error.message, true);
+            }
+        };
+
+        // Subscribe to stream
+        subscribeButton.onclick = async () => {
+            try {
+                const offer = await createPeerConnection('subscribe');
+                ws.send(JSON.stringify({
+                    type: 'subscribe',
+                    room: roomId,
+                    peer: peerId,
+                    sdp: offer
+                }));
+                updateStatus('Subscribing to stream...');
+            } catch (error) {
+                updateStatus('Error subscribing to stream: ' + error.message, true);
+            }
+        };
+
+        // Create peer connection
+        async function createPeerConnection(type) {
+            const config = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            };
+
+            peerConnection = new RTCPeerConnection(config);
+
+            // Add ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    const candidate = {
+                        type: 'candidate',
+                        room: roomId,
+                        peer: peerId,
+                        candidate: event.candidate,
+                        type: type
+                    };
+                    ws.send(JSON.stringify(candidate));
+                    
+                    // Display ICE candidates for debugging
+                    const candidateDiv = document.createElement('div');
+                    candidateDiv.textContent = `ICE Candidate: ${event.candidate.candidate}`;
+                    iceCandidatesDiv.appendChild(candidateDiv);
+                }
+            };
+
+            // Add tracks for publisher
+            if (type === 'publish' && localStream) {
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+            }
+
+            // Handle remote tracks for subscriber
+            if (type === 'subscribe') {
+                peerConnection.ontrack = (event) => {
+                    if (event.streams && event.streams[0]) {
+                        remoteVideo.srcObject = event.streams[0];
+                        updateStatus('Received remote stream');
+                    }
+                };
+            }
+
+            // Create offer or answer based on type
+            if (type === 'publish' || type === 'subscribe') {
+                const offer = await peerConnection.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
+                await peerConnection.setLocalDescription(offer);
+                return offer;
+            }
+        }
+
+        // Handle offer
+        async function handleOffer(offer) {
+            if (!peerConnection) {
+                await createPeerConnection('answer');
+            }
+            
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                
+                ws.send(JSON.stringify({
+                    type: 'answer',
+                    room: roomId,
+                    peer: peerId,
+                    sdp: answer
+                }));
+                
+                updateStatus('Answer sent');
+            } catch (error) {
+                updateStatus('Error handling offer: ' + error.message, true);
+            }
+        }
+
+        // Handle answer
+        async function handleAnswer(answer) {
+            if (!peerConnection) {
+                updateStatus('No peer connection', true);
+                return;
+            }
+            
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                updateStatus('Answer received and processed');
+            } catch (error) {
+                updateStatus('Error handling answer: ' + error.message, true);
+            }
+        }
+
+        // Handle ICE candidate
+        async function handleCandidate(candidate) {
+            if (!peerConnection) {
+                updateStatus('No peer connection for candidate', true);
+                return;
+            }
+            
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                console.log('Added ICE candidate:', candidate);
+            } catch (error) {
+                updateStatus('Error adding ICE candidate: ' + error.message, true);
+            }
+        }
+
+        // Initialize
+        connectWebSocket();
+    </script>
+</body>
+</html>

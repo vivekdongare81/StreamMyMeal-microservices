@@ -8,6 +8,13 @@ The system supports real-time broadcasts, live viewer stats, and robust order/pa
 
 ---
 
+## Architecture Prerequisites
+- Docker 20.10.0 or higher
+- Docker Compose 2.0.0 or higher
+- At least 8GB RAM (16GB recommended)
+- At least 4 CPU cores
+
+---
 ## 📚 Table of Contents
 - [Architecture Overview](#architecture-overview)
 - [Key Components](#key-components)
